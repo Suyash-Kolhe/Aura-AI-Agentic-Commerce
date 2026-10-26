@@ -941,5 +941,41 @@ export function advanceOrderTrackingStep(tracking: OrderTrackingInfo): OrderTrac
   return createOrderTrackingInfo(tracking.orderId, nextStep);
 }
 
+export interface FilterableOrder {
+  orderId: string;
+  item: string;
+  specs?: string;
+  status?: string;
+  tracking?: {
+    trackingNumber?: string;
+    currentStatusLabel?: string;
+  };
+}
+
+/**
+ * Pure function to filter active orders by product name, order ID, specs, or transaction status.
+ * Returns all orders if query is empty or only whitespace.
+ */
+export function filterOrders<T extends FilterableOrder>(
+  orders: T[],
+  query: string
+): T[] {
+  const normalized = (query || '').trim().toLowerCase();
+  if (!normalized) return orders;
+
+  return orders.filter((order) => {
+    const idMatch = (order.orderId || '').toLowerCase().includes(normalized);
+    const itemMatch = (order.item || '').toLowerCase().includes(normalized);
+    const specsMatch = (order.specs || '').toLowerCase().includes(normalized);
+    const trackingMatch =
+      (order.tracking?.trackingNumber || '').toLowerCase().includes(normalized) ||
+      (order.tracking?.currentStatusLabel || '').toLowerCase().includes(normalized);
+    const statusMatch = (order.status || '').toLowerCase().includes(normalized);
+
+    return idMatch || itemMatch || specsMatch || Boolean(trackingMatch) || statusMatch;
+  });
+}
+
+
 
 

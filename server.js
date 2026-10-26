@@ -786,6 +786,42 @@ function createOrderTrackingInfo(orderId, stepIndex = 1) {
   };
 }
 
+// Seed demo orders so /api/orders returns consistent transactions matching client initial state
+sessionOrders.push(
+  {
+    orderId: 'ORD-98741-AURA',
+    item: 'Aether ANC-1 Studio Headphones',
+    price: 349.0,
+    imageUrl: '/images/aether-headphones.svg',
+    category: 'Spatial Audio',
+    specs: '45mm Beryllium Drivers · 48dB Hybrid ANC · 60h Battery',
+    status: 'COMPLETED',
+    approveUrl: 'https://www.sandbox.paypal.com/checkoutnow?token=ORD-98741-AURA',
+    tracking: createOrderTrackingInfo('ORD-98741-AURA', 2),
+  },
+  {
+    orderId: 'ORD-84512-PRO',
+    item: 'Chrono Titanium Pro Watch',
+    price: 429.0,
+    imageUrl: '/images/chrono-watch.svg',
+    category: 'Wearables',
+    specs: 'Aerospace Grade 5 Titanium · Dual-band GPS · 14-Day Battery',
+    status: 'CREATED',
+    approveUrl: 'https://www.sandbox.paypal.com/checkoutnow?token=ORD-84512-PRO',
+  },
+  {
+    orderId: 'ORD-62190-STUDIO',
+    item: 'AeroStride Carbon Marathon Sneakers',
+    price: 219.0,
+    imageUrl: '/images/aerostride-sneakers.svg',
+    category: 'Footwear & Sneakers',
+    specs: 'Dual-Density Pebax Foam · Full-Length Carbon Plate',
+    status: 'COMPLETED',
+    approveUrl: 'https://www.sandbox.paypal.com/checkoutnow?token=ORD-62190-STUDIO',
+    tracking: createOrderTrackingInfo('ORD-62190-STUDIO', 4),
+  }
+);
+
 app.get('/api/orders', (_req, res) => {
   res.json({ orders: sessionOrders });
 });

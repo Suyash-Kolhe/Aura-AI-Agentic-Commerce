@@ -20,6 +20,7 @@ import {
   moveWishlistItemToCart,
   moveAllWishlistToCart,
   filterCatalogProducts,
+  filterOrders,
 } from './commerce';
 
 test('parsePurchaseIntent detects raw purchase JSON accurately', () => {
@@ -264,6 +265,77 @@ test('Order Tracking pure functions initialize shipping milestones and advance d
   assert.equal(afterDelivered.currentStepIndex, 4);
   assert.equal(afterDelivered.progressPercent, 100);
 });
+
+test('filterOrders filters active orders by product name or order ID accurately', () => {
+  const sampleOrders = [
+    {
+      orderId: 'ORD-98765-ABC',
+      item: 'Aether ANC-1 Studio Headphones',
+      specs: '45mm Beryllium Drivers',
+      price: 349,
+      status: 'COMPLETED',
+      tracking: {
+        trackingNumber: 'AURA-TRK-98765ABC',
+        currentStatusLabel: 'Shipped · In Transit',
+      },
+    },
+    {
+      orderId: 'ORD-11223-XYZ',
+      item: 'Chrono Titanium Pro Watch',
+      specs: 'Sapphire Crystal · ECG Monitor',
+      price: 429,
+      status: 'CREATED',
+    },
+    {
+      orderId: 'ORD-44556-BUNDLE',
+      item: 'Cart Bundle (2 items): Lumina Air AR Smart Glasses + Cyberdeck 40 mechanical keyboard',
+      specs: 'Lumina Air AR Smart Glasses ×1, Cyberdeck 40 ×1',
+      price: 848,
+      status: 'COMPLETED',
+      tracking: {
+        trackingNumber: 'AURA-TRK-44556BUN',
+        currentStatusLabel: 'Out for Delivery',
+      },
+    },
+  ];
+
+  // Empty or whitespace query returns all orders
+  assert.equal(filterOrders(sampleOrders, '').length, 3);
+  assert.equal(filterOrders(sampleOrders, '   ').length, 3);
+
+  // Filter by exact or partial order ID (case-insensitive)
+  const byId = filterOrders(sampleOrders, 'ord-11223');
+  assert.equal(byId.length, 1);
+  assert.equal(byId[0].orderId, 'ORD-11223-XYZ');
+
+  const byIdUpper = filterOrders(sampleOrders, '98765-ABC');
+  assert.equal(byIdUpper.length, 1);
+  assert.equal(byIdUpper[0].item, 'Aether ANC-1 Studio Headphones');
+
+  // Filter by product name
+  const byName = filterOrders(sampleOrders, 'Headphones');
+  assert.equal(byName.length, 1);
+  assert.equal(byName[0].orderId, 'ORD-98765-ABC');
+
+  // Filter by product name inside cart bundle
+  const byBundleItem = filterOrders(sampleOrders, 'Lumina Air');
+  assert.equal(byBundleItem.length, 1);
+  assert.equal(byBundleItem[0].orderId, 'ORD-44556-BUNDLE');
+
+  // Filter by tracking number
+  const byTracking = filterOrders(sampleOrders, 'TRK-98765');
+  assert.equal(byTracking.length, 1);
+  assert.equal(byTracking[0].orderId, 'ORD-98765-ABC');
+
+  // Filter by transaction status
+  const byCompleted = filterOrders(sampleOrders, 'completed');
+  assert.equal(byCompleted.length, 2);
+
+  // Non-matching query returns empty list
+  const noMatches = filterOrders(sampleOrders, 'non-existent-gadget-xyz');
+  assert.equal(noMatches.length, 0);
+});
+
 
 
 

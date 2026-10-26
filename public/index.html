@@ -830,6 +830,40 @@
                 <pre id="json-intent-code" class="text-emerald-400 whitespace-pre-wrap break-all"></pre>
               </div>
 
+              <!-- Orders Search Filter Input -->
+              <div class="mb-3.5">
+                <label for="ledger-search-input" class="sr-only">Filter active orders by product name or order ID</label>
+                <div class="relative flex items-center">
+                  <svg class="w-3.5 h-3.5 text-zinc-400 absolute left-3 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  <input
+                    type="text"
+                    id="ledger-search-input"
+                    aria-label="Filter active orders by product name or order ID"
+                    placeholder="Search orders by product name or order ID..."
+                    class="w-full pl-8 pr-8 py-2 bg-black/40 border border-white/10 rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
+                  />
+                  <button
+                    type="button"
+                    id="clear-ledger-search-btn"
+                    aria-label="Clear order search"
+                    title="Clear search"
+                    class="hidden absolute right-2.5 p-1 text-zinc-400 hover:text-white rounded hover:bg-white/10 transition cursor-pointer"
+                  >
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                  </button>
+                </div>
+                <div id="ledger-search-meta" class="hidden items-center justify-between text-[11px] text-zinc-400 mt-1.5 px-0.5">
+                  <span id="ledger-search-count-text"></span>
+                  <button
+                    type="button"
+                    id="ledger-reset-filter-btn"
+                    class="text-purple-300 hover:text-white underline cursor-pointer text-[11px]"
+                  >
+                    Reset filter
+                  </button>
+                </div>
+              </div>
+
               <!-- Orders List -->
               <div id="orders-container" class="space-y-3">
                 <div id="empty-orders-state" class="py-4 text-center text-xs text-zinc-500">
@@ -2017,6 +2051,7 @@
           if (chatView) chatView.classList.remove('hidden');
           window.location.hash = '#chat';
           window.scrollTo({ top: 0, behavior: 'smooth' });
+          renderOrdersLedger();
         } else {
           if (chatView) chatView.classList.add('hidden');
           if (cartView) cartView.classList.add('hidden');
@@ -2494,7 +2529,119 @@
         },
       ];
 
-      let activeOrders = [];
+      const ORDER_TRACKING_STAGES = [
+        {
+          code: 'ORDER_CONFIRMED',
+          label: 'Order Confirmed',
+          detail: 'PayPal payment captured & verified. Inventory reserved at fulfillment center.',
+          location: 'Aura Global Fulfillment Hub',
+          etaText: 'Est. Delivery: 3 Business Days',
+          progressPercent: 20,
+        },
+        {
+          code: 'PACKED',
+          label: 'Packed & Insured',
+          detail: 'Quality inspection passed. Sealed in shock-proof packaging with insured airway bill.',
+          location: 'San Jose Dispatch Facility',
+          etaText: 'Est. Delivery: 2–3 Business Days',
+          progressPercent: 40,
+        },
+        {
+          code: 'IN_TRANSIT',
+          label: 'Shipped · In Transit',
+          detail: 'Departed regional sorting facility aboard Aura Priority Express Air cargo.',
+          location: 'Memphis Express Air Hub',
+          etaText: 'Est. Delivery: Tomorrow by 8:00 PM',
+          progressPercent: 65,
+        },
+        {
+          code: 'OUT_FOR_DELIVERY',
+          label: 'Out for Delivery',
+          detail: 'Loaded onto local courier vehicle for final-mile priority doorstep delivery.',
+          location: 'Local Metropolitan Courier Depot',
+          etaText: 'Arriving Today by 6:00 PM',
+          progressPercent: 85,
+        },
+        {
+          code: 'DELIVERED',
+          label: 'Delivered',
+          detail: 'Package delivered safely to recipient address. Digital proof of delivery recorded.',
+          location: 'Recipient Front Door / Concierge',
+          etaText: 'Delivered · Signed & Verified',
+          progressPercent: 100,
+        },
+      ];
+
+      function createOrderTrackingInfo(orderId, stepIndex = 1) {
+        const cleanId = String(orderId || 'ORD0000')
+          .replace(/[^a-zA-Z0-9]/g, '')
+          .toUpperCase()
+          .slice(-8)
+          .padStart(6, '8');
+        const clampedIndex = Math.max(
+          0,
+          Math.min(ORDER_TRACKING_STAGES.length - 1, Math.floor(stepIndex))
+        );
+        const currentStage = ORDER_TRACKING_STAGES[clampedIndex];
+
+        const milestones = ORDER_TRACKING_STAGES.map((stage, idx) => ({
+          code: stage.code,
+          label: stage.label,
+          detail: stage.detail,
+          location: stage.location,
+          state: idx < clampedIndex ? 'completed' : idx === clampedIndex ? 'current' : 'upcoming',
+        }));
+
+        return {
+          orderId: orderId || 'ORD-UNKNOWN',
+          trackingNumber: `AURA-TRK-${cleanId}`,
+          carrier: 'Aura Priority Express (DHL Air)',
+          currentStepIndex: clampedIndex,
+          currentStatusLabel: currentStage.label,
+          latestUpdateMessage: `${currentStage.detail} (${currentStage.location})`,
+          estimatedDelivery: currentStage.etaText,
+          progressPercent: currentStage.progressPercent,
+          milestones,
+        };
+      }
+
+      const INITIAL_DEMO_ORDERS = [
+        {
+          orderId: 'ORD-98741-AURA',
+          item: 'Aether ANC-1 Studio Headphones',
+          price: 349.0,
+          imageUrl: '/images/aether-headphones.svg',
+          category: 'Spatial Audio',
+          specs: '45mm Beryllium Drivers · 48dB Hybrid ANC · 60h Battery',
+          status: 'COMPLETED',
+          approveUrl: 'https://www.sandbox.paypal.com/checkoutnow?token=ORD-98741-AURA',
+          tracking: createOrderTrackingInfo('ORD-98741-AURA', 2),
+        },
+        {
+          orderId: 'ORD-84512-PRO',
+          item: 'Chrono Titanium Pro Watch',
+          price: 429.0,
+          imageUrl: '/images/chrono-watch.svg',
+          category: 'Wearables',
+          specs: 'Aerospace Grade 5 Titanium · Dual-band GPS · 14-Day Battery',
+          status: 'CREATED',
+          approveUrl: 'https://www.sandbox.paypal.com/checkoutnow?token=ORD-84512-PRO',
+        },
+        {
+          orderId: 'ORD-62190-STUDIO',
+          item: 'AeroStride Carbon Marathon Sneakers',
+          price: 219.0,
+          imageUrl: '/images/aerostride-sneakers.svg',
+          category: 'Footwear & Sneakers',
+          specs: 'Dual-Density Pebax Foam · Full-Length Carbon Plate',
+          status: 'COMPLETED',
+          approveUrl: 'https://www.sandbox.paypal.com/checkoutnow?token=ORD-62190-STUDIO',
+          tracking: createOrderTrackingInfo('ORD-62190-STUDIO', 4),
+        },
+      ];
+
+      let activeOrders = [...INITIAL_DEMO_ORDERS];
+      let orderLedgerSearchQuery = '';
       let shoppingCart = [];
       let wishlistItems = [];
       let isCartCheckingOut = false;
@@ -3377,82 +3524,6 @@
         scrollToBottom();
       }
 
-      const ORDER_TRACKING_STAGES = [
-        {
-          code: 'ORDER_CONFIRMED',
-          label: 'Order Confirmed',
-          detail: 'PayPal payment captured & verified. Inventory reserved at fulfillment center.',
-          location: 'Aura Global Fulfillment Hub',
-          etaText: 'Est. Delivery: 3 Business Days',
-          progressPercent: 20,
-        },
-        {
-          code: 'PACKED',
-          label: 'Packed & Insured',
-          detail: 'Quality inspection passed. Sealed in shock-proof packaging with insured airway bill.',
-          location: 'San Jose Dispatch Facility',
-          etaText: 'Est. Delivery: 2–3 Business Days',
-          progressPercent: 40,
-        },
-        {
-          code: 'IN_TRANSIT',
-          label: 'Shipped · In Transit',
-          detail: 'Departed regional sorting facility aboard Aura Priority Express Air cargo.',
-          location: 'Memphis Express Air Hub',
-          etaText: 'Est. Delivery: Tomorrow by 8:00 PM',
-          progressPercent: 65,
-        },
-        {
-          code: 'OUT_FOR_DELIVERY',
-          label: 'Out for Delivery',
-          detail: 'Loaded onto local courier vehicle for final-mile priority doorstep delivery.',
-          location: 'Local Metropolitan Courier Depot',
-          etaText: 'Arriving Today by 6:00 PM',
-          progressPercent: 85,
-        },
-        {
-          code: 'DELIVERED',
-          label: 'Delivered',
-          detail: 'Package delivered safely to recipient address. Digital proof of delivery recorded.',
-          location: 'Recipient Front Door / Concierge',
-          etaText: 'Delivered · Signed & Verified',
-          progressPercent: 100,
-        },
-      ];
-
-      function createOrderTrackingInfo(orderId, stepIndex = 1) {
-        const cleanId = String(orderId || 'ORD0000')
-          .replace(/[^a-zA-Z0-9]/g, '')
-          .toUpperCase()
-          .slice(-8)
-          .padStart(6, '8');
-        const clampedIndex = Math.max(
-          0,
-          Math.min(ORDER_TRACKING_STAGES.length - 1, Math.floor(stepIndex))
-        );
-        const currentStage = ORDER_TRACKING_STAGES[clampedIndex];
-
-        const milestones = ORDER_TRACKING_STAGES.map((stage, idx) => ({
-          code: stage.code,
-          label: stage.label,
-          detail: stage.detail,
-          location: stage.location,
-          state: idx < clampedIndex ? 'completed' : idx === clampedIndex ? 'current' : 'upcoming',
-        }));
-
-        return {
-          orderId: orderId || 'ORD-UNKNOWN',
-          trackingNumber: `AURA-TRK-${cleanId}`,
-          carrier: 'Aura Priority Express (DHL Air)',
-          currentStepIndex: clampedIndex,
-          currentStatusLabel: currentStage.label,
-          latestUpdateMessage: `${currentStage.detail} (${currentStage.location})`,
-          estimatedDelivery: currentStage.etaText,
-          progressPercent: currentStage.progressPercent,
-          milestones,
-        };
-      }
-
       async function advanceOrderTrackingById(orderId) {
         const matched = activeOrders.find((o) => o.orderId === orderId);
         if (!matched) return;
@@ -3478,12 +3549,55 @@
       }
 
       function renderOrdersLedger() {
-        const labelText = `${activeOrders.length} PayPal Order${activeOrders.length === 1 ? '' : 's'} Created`;
+        const query = (orderLedgerSearchQuery || '').trim().toLowerCase();
+        const totalOrders = activeOrders.length;
+
+        const filteredOrders = query
+          ? activeOrders.filter((ord) => {
+              const idMatch = (ord.orderId || '').toLowerCase().includes(query);
+              const itemMatch = (ord.item || '').toLowerCase().includes(query);
+              const specsMatch = (ord.specs || '').toLowerCase().includes(query);
+              const statusMatch = (ord.status || '').toLowerCase().includes(query);
+              const trackingMatch =
+                (ord.tracking?.trackingNumber || '').toLowerCase().includes(query) ||
+                (ord.tracking?.currentStatusLabel || '').toLowerCase().includes(query);
+              return idMatch || itemMatch || specsMatch || statusMatch || Boolean(trackingMatch);
+            })
+          : activeOrders;
+
+        const countText = query
+          ? `${filteredOrders.length}/${totalOrders} Orders`
+          : `${totalOrders} PayPal Order${totalOrders === 1 ? '' : 's'} Created`;
+
         document.querySelectorAll('.order-count-label').forEach((el) => {
-          el.textContent = labelText;
+          el.textContent = countText;
         });
 
-        if (activeOrders.length === 0) {
+        const searchInput = document.getElementById('ledger-search-input');
+        const clearBtn = document.getElementById('clear-ledger-search-btn');
+        const searchMeta = document.getElementById('ledger-search-meta');
+        const searchCountText = document.getElementById('ledger-search-count-text');
+
+        if (clearBtn) {
+          if (query) {
+            clearBtn.classList.remove('hidden');
+          } else {
+            clearBtn.classList.add('hidden');
+          }
+        }
+
+        if (searchMeta && searchCountText) {
+          if (query) {
+            searchMeta.classList.remove('hidden');
+            searchMeta.classList.add('flex');
+            searchCountText.textContent = `Showing ${filteredOrders.length} of ${totalOrders} order${totalOrders === 1 ? '' : 's'}`;
+          } else {
+            searchMeta.classList.add('hidden');
+            searchMeta.classList.remove('flex');
+          }
+        }
+
+        if (totalOrders === 0) {
           ordersContainer.innerHTML = `
             <div class="py-4 text-center text-xs text-zinc-500">
               No PayPal orders initiated yet. Complete an order via your Shopping Cart or Aura AI to unlock live Order Tracking &amp; delivery updates.
@@ -3492,7 +3606,35 @@
           return;
         }
 
-        ordersContainer.innerHTML = activeOrders
+        if (filteredOrders.length === 0) {
+          ordersContainer.innerHTML = `
+            <div class="py-6 text-center text-xs text-zinc-400 bg-white/5 rounded-xl border border-white/10 p-5 space-y-2.5">
+              <svg class="w-6 h-6 text-zinc-500 mx-auto opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <div class="font-semibold text-zinc-200 text-sm">No matching orders found</div>
+              <p class="text-xs text-zinc-400 max-w-xs mx-auto">
+                No active orders match &ldquo;<span class="text-purple-300 font-mono">${escapeHtml(orderLedgerSearchQuery)}</span>&rdquo;. Try searching with a different product name or order ID.
+              </p>
+              <button
+                type="button"
+                id="ledger-empty-clear-btn"
+                class="mt-1 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-purple-600/30 hover:bg-purple-600/50 border border-purple-400/40 text-purple-200 font-medium transition cursor-pointer"
+              >
+                Clear Search Filter
+              </button>
+            </div>
+          `;
+          const emptyClearBtn = document.getElementById('ledger-empty-clear-btn');
+          if (emptyClearBtn) {
+            emptyClearBtn.addEventListener('click', () => {
+              orderLedgerSearchQuery = '';
+              if (searchInput) searchInput.value = '';
+              renderOrdersLedger();
+            });
+          }
+          return;
+        }
+
+        ordersContainer.innerHTML = filteredOrders
           .map((ord) => {
             const formattedPrice = Number(ord.price).toFixed(2);
             const isCompleted = ord.status === 'COMPLETED';
@@ -3936,8 +4078,40 @@
         animateBubbleEntrance(initialWelcome);
       }
 
+      const ledgerSearchInput = document.getElementById('ledger-search-input');
+      const clearLedgerSearchBtn = document.getElementById('clear-ledger-search-btn');
+      const ledgerResetFilterBtn = document.getElementById('ledger-reset-filter-btn');
+
+      if (ledgerSearchInput) {
+        ledgerSearchInput.addEventListener('input', (e) => {
+          orderLedgerSearchQuery = e.target.value;
+          renderOrdersLedger();
+        });
+      }
+      if (clearLedgerSearchBtn) {
+        clearLedgerSearchBtn.addEventListener('click', () => {
+          orderLedgerSearchQuery = '';
+          if (ledgerSearchInput) {
+            ledgerSearchInput.value = '';
+            ledgerSearchInput.focus();
+          }
+          renderOrdersLedger();
+        });
+      }
+      if (ledgerResetFilterBtn) {
+        ledgerResetFilterBtn.addEventListener('click', () => {
+          orderLedgerSearchQuery = '';
+          if (ledgerSearchInput) {
+            ledgerSearchInput.value = '';
+            ledgerSearchInput.focus();
+          }
+          renderOrdersLedger();
+        });
+      }
+
       window.addEventListener('hashchange', handleInitialRoute);
       handleInitialRoute();
+      renderOrdersLedger();
     </script>
   </body>
 </html>

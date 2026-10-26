@@ -18,6 +18,7 @@ import {
   Truck,
   Package,
   MapPin,
+  X,
 } from 'lucide-react';
 import logoImg from '../assets/logo.png';
 import { UserProfile } from './AuthModal';
@@ -41,6 +42,7 @@ import {
   advanceOrderTrackingStep,
   parsePurchaseIntent,
   resolveProductDetails,
+  filterOrders,
 } from '../utils/commerce';
 import { formatUserInitials } from '../utils/auth';
 
@@ -69,6 +71,41 @@ export interface ActiveOrder {
   tracking?: OrderTrackingInfo;
 }
 
+export const INITIAL_DEMO_ORDERS: ActiveOrder[] = [
+  {
+    orderId: 'ORD-98741-AURA',
+    item: 'Aether ANC-1 Studio Headphones',
+    price: 349.0,
+    imageUrl: '/images/aether-headphones.svg',
+    category: 'Spatial Audio',
+    specs: '45mm Beryllium Drivers · 48dB Hybrid ANC · 60h Battery',
+    status: 'COMPLETED',
+    approveUrl: 'https://www.sandbox.paypal.com/checkoutnow?token=ORD-98741-AURA',
+    tracking: createOrderTrackingInfo('ORD-98741-AURA', 2),
+  },
+  {
+    orderId: 'ORD-84512-PRO',
+    item: 'Chrono Titanium Pro Watch',
+    price: 429.0,
+    imageUrl: '/images/chrono-watch.svg',
+    category: 'Wearables',
+    specs: 'Aerospace Grade 5 Titanium · Dual-band GPS · 14-Day Battery',
+    status: 'CREATED',
+    approveUrl: 'https://www.sandbox.paypal.com/checkoutnow?token=ORD-84512-PRO',
+  },
+  {
+    orderId: 'ORD-62190-STUDIO',
+    item: 'AeroStride Carbon Marathon Sneakers',
+    price: 219.0,
+    imageUrl: '/images/aerostride-sneakers.svg',
+    category: 'Footwear & Sneakers',
+    specs: 'Dual-Density Pebax Foam · Full-Length Carbon Plate',
+    status: 'COMPLETED',
+    approveUrl: 'https://www.sandbox.paypal.com/checkoutnow?token=ORD-62190-STUDIO',
+    tracking: createOrderTrackingInfo('ORD-62190-STUDIO', 4),
+  },
+];
+
 interface ChatPageProps {
   currentUser: UserProfile | null;
   onBackToHome: () => void;
@@ -88,7 +125,8 @@ export default function ChatPage({ currentUser, onBackToHome, onLogout }: ChatPa
   const [cart, setCart] = useState<CartItem[]>([]);
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [cartCheckoutLoading, setCartCheckoutLoading] = useState(false);
-  const [activeOrders, setActiveOrders] = useState<ActiveOrder[]>([]);
+  const [activeOrders, setActiveOrders] = useState<ActiveOrder[]>(INITIAL_DEMO_ORDERS);
+  const [orderSearchQuery, setOrderSearchQuery] = useState<string>('');
   const [lastIntent, setLastIntent] = useState<{ item: string; price: number } | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('All Categories');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -96,6 +134,7 @@ export default function ChatPage({ currentUser, onBackToHome, onLogout }: ChatPa
 
   const cartSummary = calculateCartSummary(cart);
   const filteredProducts = filterCatalogProducts(CURATED_GADGETS, selectedCategory, searchQuery);
+  const filteredActiveOrders = filterOrders(activeOrders, orderSearchQuery);
   const categoryOptions = [
     'All Categories',
     'Electronics & Tech',
@@ -1130,8 +1169,54 @@ export default function ChatPage({ currentUser, onBackToHome, onLogout }: ChatPa
                   <h2 className="text-sm font-bold text-white">PayPal Orders Ledger</h2>
                 </div>
                 <span className="text-xs text-purple-300 font-mono tabular-nums">
-                  {activeOrders.length} Order{activeOrders.length === 1 ? '' : 's'}
+                  {orderSearchQuery.trim()
+                    ? `${filteredActiveOrders.length}/${activeOrders.length} Orders`
+                    : `${activeOrders.length} Order${activeOrders.length === 1 ? '' : 's'}`}
                 </span>
+              </div>
+
+              {/* Order Ledger Search Filter Input */}
+              <div className="mb-3">
+                <label htmlFor="order-ledger-search" className="sr-only">
+                  Filter active orders by product name or order ID
+                </label>
+                <div className="relative flex items-center">
+                  <Search className="w-3.5 h-3.5 absolute left-3 text-zinc-400 pointer-events-none" />
+                  <input
+                    id="order-ledger-search"
+                    type="text"
+                    value={orderSearchQuery}
+                    onChange={(e) => setOrderSearchQuery(e.target.value)}
+                    placeholder="Search orders by product name or order ID..."
+                    aria-label="Filter active orders by product name or order ID"
+                    className="w-full pl-8 pr-8 py-2 bg-black/40 border border-white/10 rounded-xl text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
+                  />
+                  {orderSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setOrderSearchQuery('')}
+                      className="absolute right-2.5 p-1 text-zinc-400 hover:text-white rounded hover:bg-white/10 transition cursor-pointer"
+                      aria-label="Clear order search"
+                      title="Clear search"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+                {orderSearchQuery.trim() && (
+                  <div className="flex items-center justify-between text-[11px] text-zinc-400 mt-1.5 px-0.5">
+                    <span>
+                      Showing {filteredActiveOrders.length} of {activeOrders.length} order{activeOrders.length === 1 ? '' : 's'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setOrderSearchQuery('')}
+                      className="text-purple-300 hover:text-white underline cursor-pointer text-[11px]"
+                    >
+                      Reset filter
+                    </button>
+                  </div>
+                )}
               </div>
 
               {lastIntent && (
@@ -1146,9 +1231,24 @@ export default function ChatPage({ currentUser, onBackToHome, onLogout }: ChatPa
                 <div className="py-6 text-center text-xs text-zinc-500">
                   No PayPal orders initiated yet. Add products to your Shopping Cart above and click <strong>Proceed to PayPal Checkout</strong>.
                 </div>
+              ) : filteredActiveOrders.length === 0 ? (
+                <div className="py-6 text-center text-xs text-zinc-400 bg-white/5 rounded-xl border border-white/10 p-4 space-y-2.5">
+                  <Search className="w-5 h-5 text-zinc-500 mx-auto opacity-70" />
+                  <div className="font-semibold text-zinc-200 text-sm">No matching orders found</div>
+                  <p className="text-[11px] text-zinc-400 max-w-xs mx-auto">
+                    No active orders match &quot;<span className="text-purple-300 font-mono">{orderSearchQuery}</span>&quot;. Try searching with a different product name or order ID.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setOrderSearchQuery('')}
+                    className="mt-1 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-purple-600/30 hover:bg-purple-600/50 border border-purple-400/40 text-purple-200 font-medium transition cursor-pointer"
+                  >
+                    Clear search filter
+                  </button>
+                </div>
               ) : (
                 <div className="space-y-3 max-h-[520px] overflow-y-auto pr-1">
-                  {activeOrders.map((ord) => {
+                  {filteredActiveOrders.map((ord) => {
                     const isCompleted = ord.status === 'COMPLETED';
                     const tracking = isCompleted
                       ? ord.tracking || createOrderTrackingInfo(ord.orderId, 1)

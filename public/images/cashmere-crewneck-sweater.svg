@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgCash" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F7F5F2"/>
+      <stop offset="100%" stop-color="#E5DFD6"/>
+    </linearGradient>
+    <radialGradient id="shadowCash" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#09090B" stop-opacity="0.22"/>
+      <stop offset="70%" stop-color="#09090B" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#09090B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cashmereKnit" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E6C8B8"/>
+      <stop offset="50%" stop-color="#D4AC98"/>
+      <stop offset="100%" stop-color="#B88974"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="450" fill="url(#bgCash)"/>
+  <path d="M0 355 L600 355 L600 450 L0 450 Z" fill="#DFD9CF"/>
+  <line x1="0" y1="355" x2="600" y2="355" stroke="#CBC3B6" stroke-width="1.5"/>
+
+  <ellipse cx="300" cy="380" rx="170" ry="20" fill="url(#shadowCash)"/>
+
+  <!-- Cashmere Sleeves -->
+  <path d="M196 108 L122 288 L164 304 L214 166 Z" fill="url(#cashmereKnit)" stroke="#9E715C" stroke-width="2"/>
+  <path d="M404 108 L478 288 L436 304 L386 166 Z" fill="url(#cashmereKnit)" stroke="#9E715C" stroke-width="2"/>
+  <!-- Ribbed Cuffs -->
+  <polygon points="122,288 164,304 156,322 114,306" fill="#B88974" stroke="#9E715C" stroke-width="1.5"/>
+  <polygon points="478,288 436,304 444,322 486,306" fill="#B88974" stroke="#9E715C" stroke-width="1.5"/>
+
+  <!-- Main Cashmere Sweater Torso -->
+  <rect x="194" y="96" width="212" height="242" rx="18" fill="url(#cashmereKnit)" stroke="#9E715C" stroke-width="2"/>
+
+  <!-- Subtle Vertical Cable Knit Texture Lines -->
+  <g stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="2" stroke-dasharray="6 4">
+    <line x1="226" y1="125" x2="226" y2="310"/>
+    <line x1="256" y1="125" x2="256" y2="310"/>
+    <line x1="286" y1="135" x2="286" y2="310"/>
+    <line x1="314" y1="135" x2="314" y2="310"/>
+    <line x1="344" y1="125" x2="344" y2="310"/>
+    <line x1="374" y1="125" x2="374" y2="310"/>
+  </g>
+
+  <!-- Ribbed Crewneck Collar -->
+  <ellipse cx="300" cy="100" rx="54" ry="24" fill="#B88974" stroke="#9E715C" stroke-width="2"/>
+  <ellipse cx="300" cy="96" rx="38" ry="14" fill="#7D5645"/>
+  <!-- Ribbed V-Gusset Stitch -->
+  <polygon points="282,123 318,123 300,145" fill="#C49A86" stroke="#9E715C" stroke-width="1.2"/>
+
+  <!-- Ribbed Bottom Waist Hem -->
+  <rect x="196" y="314" width="208" height="24" rx="6" fill="#B88974" stroke="#9E715C" stroke-width="1.8"/>
+</svg>

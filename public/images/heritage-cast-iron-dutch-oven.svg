@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgOven" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F6F3EF"/>
+      <stop offset="100%" stop-color="#E3DDD2"/>
+    </linearGradient>
+    <radialGradient id="shadowOven" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#09090B" stop-opacity="0.28"/>
+      <stop offset="70%" stop-color="#09090B" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#09090B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="enamelFlame" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F97316"/>
+      <stop offset="50%" stop-color="#DC2626"/>
+      <stop offset="100%" stop-color="#991B1B"/>
+    </linearGradient>
+    <linearGradient id="brassKnobOven" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FEF08A"/>
+      <stop offset="50%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#78350F"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="450" fill="url(#bgOven)"/>
+  <path d="M0 345 L600 345 L600 450 L0 450 Z" fill="#DED7CA"/>
+  <line x1="0" y1="345" x2="600" y2="345" stroke="#C8C0B0" stroke-width="1.5"/>
+
+  <ellipse cx="300" cy="364" rx="205" ry="24" fill="url(#shadowOven)"/>
+
+  <!-- Cast Iron Side Loop Handles -->
+  <path d="M148 212 C102 212, 102 258, 148 258" fill="none" stroke="#991B1B" stroke-width="14" stroke-linecap="round"/>
+  <path d="M452 212 C498 212, 498 258, 452 258" fill="none" stroke="#991B1B" stroke-width="14" stroke-linecap="round"/>
+
+  <!-- 6-Quart Enameled Cast Iron Pot Body -->
+  <path d="M144 196 L456 196 L436 334 C432 352, 412 362, 386 362 L214 362 C188 362, 168 352, 164 334 Z" fill="url(#enamelFlame)" stroke="#7F1D1D" stroke-width="2.5"/>
+
+  <!-- Glossy Porcelain Specular Highlight -->
+  <path d="M178 214 L190 326" stroke="#FFFFFF" stroke-opacity="0.32" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- Domed Self-Basting Lid with Concentric Rings -->
+  <path d="M138 196 C158 144, 442 144, 462 196 Z" fill="url(#enamelFlame)" stroke="#7F1D1D" stroke-width="2.5"/>
+  <path d="M175 182 C215 158, 385 158, 425 182" fill="none" stroke="#FCA5A5" stroke-opacity="0.45" stroke-width="2"/>
+  <rect x="136" y="192" width="328" height="8" rx="4" fill="#450A0A"/>
+
+  <!-- Signature Brushed Brass Lid Knob -->
+  <rect x="288" y="140" width="24" height="14" rx="3" fill="url(#brassKnobOven)"/>
+  <ellipse cx="300" cy="136" rx="32" ry="10" fill="url(#brassKnobOven)" stroke="#FEF3C7" stroke-width="1.5"/>
+</svg>

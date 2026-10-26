@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgEink" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F6F4EF"/>
+      <stop offset="100%" stop-color="#E3DEC8"/>
+    </linearGradient>
+    <radialGradient id="shadowEink" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#09090B" stop-opacity="0.26"/>
+      <stop offset="70%" stop-color="#09090B" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#09090B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="einkPaper" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFBEB"/>
+      <stop offset="100%" stop-color="#F5F0E1"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="450" fill="url(#bgEink)"/>
+  <path d="M0 350 L600 350 L600 450 L0 450 Z" fill="#DFD9C8"/>
+  <line x1="0" y1="350" x2="600" y2="350" stroke="#C8C0AD" stroke-width="1.5"/>
+
+  <ellipse cx="300" cy="374" rx="165" ry="20" fill="url(#shadowEink)"/>
+
+  <!-- Asymmetric Ergonomic E-Reader Chassis -->
+  <rect x="184" y="68" width="232" height="296" rx="18" fill="#27272A" stroke="#52525B" stroke-width="2.5"/>
+
+  <!-- 300 PPI Carta 1300 Warm Glare-Free E-Ink Display -->
+  <rect x="200" y="86" width="176" height="260" rx="6" fill="url(#einkPaper)" stroke="#3F3F46" stroke-width="1.5"/>
+
+  <!-- Physical Tactile Page-Turn Buttons on Wide Right Grip Bezel -->
+  <rect x="390" y="168" width="8" height="44" rx="3" fill="#52525B"/>
+  <rect x="390" y="222" width="8" height="44" rx="3" fill="#52525B"/>
+
+  <!-- Book Typography Rendered on E-Ink Screen -->
+  <text x="288" y="114" text-anchor="middle" fill="#78716C" font-family="serif" font-size="8" letter-spacing="2">CHAPTER IV</text>
+  <text x="288" y="134" text-anchor="middle" fill="#1C1917" font-family="serif" font-weight="700" font-size="14">The Architecture of Light</text>
+  <line x1="258" y1="144" x2="318" y2="144" stroke="#A8A29E" stroke-width="1"/>
+
+  <g stroke="#292524" stroke-width="2.2" stroke-linecap="round">
+    <line x1="216" y1="166" x2="360" y2="166"/>
+    <line x1="216" y1="180" x2="354" y2="180"/>
+    <line x1="216" y1="194" x2="360" y2="194"/>
+    <line x1="216" y1="208" x2="346" y2="208"/>
+    <line x1="216" y1="222" x2="358" y2="222"/>
+    <line x1="216" y1="236" x2="332" y2="236"/>
+
+    <line x1="216" y1="258" x2="360" y2="258"/>
+    <line x1="216" y1="272" x2="352" y2="272"/>
+    <line x1="216" y1="286" x2="358" y2="286"/>
+    <line x1="216" y1="300" x2="340" y2="300"/>
+    <line x1="216" y1="314" x2="306" y2="314"/>
+  </g>
+
+  <text x="288" y="336" text-anchor="middle" fill="#78716C" font-family="monospace" font-size="8">PAGE 142 OF 418 · 68%</text>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgDef" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F4F4F5"/>
+      <stop offset="100%" stop-color="#E4E4E7"/>
+    </linearGradient>
+    <linearGradient id="deviceBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#27272A"/>
+      <stop offset="100%" stop-color="#09090B"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="450" fill="url(#bgDef)"/>
+  <path d="M0 345 L600 345 L600 450 L0 450 Z" fill="#DCDCE0"/>
+  <rect x="190" y="110" width="220" height="230" rx="28" fill="url(#deviceBody)" stroke="#52525B" stroke-width="2.5"/>
+  <circle cx="300" cy="215" r="52" fill="none" stroke="#007AFF" stroke-width="3.5"/>
+  <circle cx="300" cy="215" r="22" fill="#007AFF" fill-opacity="0.25"/>
+  <text x="300" y="305" text-anchor="middle" fill="#E4E4E7" font-family="sans-serif" font-weight="600" font-size="13" letter-spacing="1.5">AURA HARDWARE</text>
+</svg>

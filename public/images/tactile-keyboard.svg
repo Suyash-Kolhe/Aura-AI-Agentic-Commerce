@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgKb" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5F5F7"/>
+      <stop offset="100%" stop-color="#E4E4E7"/>
+    </linearGradient>
+    <radialGradient id="shadowKb" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#09090B" stop-opacity="0.26"/>
+      <stop offset="75%" stop-color="#09090B" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#09090B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cncCase" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3F3F46"/>
+      <stop offset="50%" stop-color="#27272A"/>
+      <stop offset="100%" stop-color="#18181B"/>
+    </linearGradient>
+    <linearGradient id="brassKnob" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE68A"/>
+      <stop offset="50%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#92400E"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="450" fill="url(#bgKb)"/>
+  <path d="M0 345 L600 345 L600 450 L0 450 Z" fill="#DCDCE0"/>
+  <line x1="0" y1="345" x2="600" y2="345" stroke="#C8C8D0" stroke-width="1.5"/>
+
+  <ellipse cx="300" cy="348" rx="238" ry="24" fill="url(#shadowKb)"/>
+
+  <!-- 6063 CNC Aluminum Chassis -->
+  <rect x="82" y="156" width="436" height="176" rx="18" fill="url(#cncCase)" stroke="#52525B" stroke-width="2.5"/>
+  <rect x="96" y="170" width="408" height="148" rx="10" fill="#09090B"/>
+
+  <!-- Row 1 Keycaps + Escape Accent + Brass Rotary Knob -->
+  <rect x="104" y="178" width="28" height="26" rx="5" fill="#EA580C"/>
+  <g fill="#E4E4E7">
+    <rect x="136" y="178" width="26" height="26" rx="5"/>
+    <rect x="166" y="178" width="26" height="26" rx="5"/>
+    <rect x="196" y="178" width="26" height="26" rx="5"/>
+    <rect x="226" y="178" width="26" height="26" rx="5"/>
+    <rect x="256" y="178" width="26" height="26" rx="5"/>
+    <rect x="286" y="178" width="26" height="26" rx="5"/>
+    <rect x="316" y="178" width="26" height="26" rx="5"/>
+    <rect x="346" y="178" width="26" height="26" rx="5"/>
+    <rect x="376" y="178" width="26" height="26" rx="5"/>
+    <rect x="406" y="178" width="26" height="26" rx="5"/>
+  </g>
+  <rect x="436" y="178" width="30" height="26" rx="5" fill="#3F3F46"/>
+  <!-- Brass Rotary Encoder Knob -->
+  <circle cx="483" cy="191" r="13" fill="url(#brassKnob)" stroke="#FEF3C7" stroke-width="1.5"/>
+
+  <!-- Row 2 Keycaps -->
+  <rect x="104" y="208" width="38" height="26" rx="5" fill="#3F3F46"/>
+  <g fill="#F4F4F5">
+    <rect x="146" y="208" width="26" height="26" rx="5"/>
+    <rect x="176" y="208" width="26" height="26" rx="5"/>
+    <rect x="206" y="208" width="26" height="26" rx="5"/>
+    <rect x="236" y="208" width="26" height="26" rx="5"/>
+    <rect x="266" y="208" width="26" height="26" rx="5"/>
+    <rect x="296" y="208" width="26" height="26" rx="5"/>
+    <rect x="326" y="208" width="26" height="26" rx="5"/>
+    <rect x="356" y="208" width="26" height="26" rx="5"/>
+    <rect x="386" y="208" width="26" height="26" rx="5"/>
+    <rect x="416" y="208" width="26" height="26" rx="5"/>
+  </g>
+  <rect x="446" y="208" width="20" height="26" rx="5" fill="#3F3F46"/>
+  <rect x="470" y="208" width="26" height="26" rx="5" fill="#3F3F46"/>
+
+  <!-- Row 3 Keycaps -->
+  <rect x="104" y="238" width="44" height="26" rx="5" fill="#3F3F46"/>
+  <g fill="#F4F4F5">
+    <rect x="152" y="238" width="26" height="26" rx="5"/>
+    <rect x="182" y="238" width="26" height="26" rx="5"/>
+    <rect x="212" y="238" width="26" height="26" rx="5"/>
+    <rect x="242" y="238" width="26" height="26" rx="5"/>
+    <rect x="272" y="238" width="26" height="26" rx="5"/>
+    <rect x="302" y="238" width="26" height="26" rx="5"/>
+    <rect x="332" y="238" width="26" height="26" rx="5"/>
+    <rect x="362" y="238" width="26" height="26" rx="5"/>
+    <rect x="392" y="238" width="26" height="26" rx="5"/>
+  </g>
+  <rect x="422" y="238" width="44" height="26" rx="5" fill="#007AFF"/>
+  <rect x="470" y="238" width="26" height="26" rx="5" fill="#3F3F46"/>
+
+  <!-- Row 4 + Spacebar Row -->
+  <rect x="104" y="268" width="56" height="20" rx="4" fill="#3F3F46"/>
+  <g fill="#E4E4E7">
+    <rect x="164" y="268" width="26" height="20" rx="4"/>
+    <rect x="194" y="268" width="26" height="20" rx="4"/>
+    <rect x="224" y="268" width="26" height="20" rx="4"/>
+    <rect x="254" y="268" width="26" height="20" rx="4"/>
+    <rect x="284" y="268" width="26" height="20" rx="4"/>
+    <rect x="314" y="268" width="26" height="20" rx="4"/>
+    <rect x="344" y="268" width="26" height="20" rx="4"/>
+    <rect x="374" y="268" width="26" height="20" rx="4"/>
+  </g>
+  <rect x="404" y="268" width="32" height="20" rx="4" fill="#3F3F46"/>
+  <rect x="440" y="268" width="26" height="20" rx="4" fill="#27272A"/>
+  <rect x="470" y="268" width="26" height="20" rx="4" fill="#3F3F46"/>
+
+  <!-- Bottom Row Spacebar -->
+  <rect x="104" y="292" width="34" height="18" rx="4" fill="#3F3F46"/>
+  <rect x="142" y="292" width="34" height="18" rx="4" fill="#3F3F46"/>
+  <rect x="180" y="292" width="34" height="18" rx="4" fill="#3F3F46"/>
+  <rect x="218" y="292" width="146" height="18" rx="4" fill="#F4F4F5"/>
+  <rect x="368" y="292" width="34" height="18" rx="4" fill="#3F3F46"/>
+  <rect x="406" y="292" width="28" height="18" rx="4" fill="#27272A"/>
+  <rect x="438" y="292" width="28" height="18" rx="4" fill="#27272A"/>
+  <rect x="470" y="292" width="26" height="18" rx="4" fill="#27272A"/>
+</svg>

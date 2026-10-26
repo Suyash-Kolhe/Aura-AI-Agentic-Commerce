@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgBoot" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F6F3EE"/>
+      <stop offset="100%" stop-color="#E2DACD"/>
+    </linearGradient>
+    <radialGradient id="shadowBoot" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#09090B" stop-opacity="0.28"/>
+      <stop offset="70%" stop-color="#09090B" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#09090B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="calfskin" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9A5833"/>
+      <stop offset="45%" stop-color="#783F1E"/>
+      <stop offset="100%" stop-color="#4A240E"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="450" fill="url(#bgBoot)"/>
+  <path d="M0 350 L600 350 L600 450 L0 450 Z" fill="#DED5C6"/>
+  <line x1="0" y1="350" x2="600" y2="350" stroke="#C8BDAB" stroke-width="1.5"/>
+
+  <ellipse cx="305" cy="368" rx="195" ry="22" fill="url(#shadowBoot)"/>
+
+  <!-- Woven Pull Tabs -->
+  <rect x="164" y="78" width="16" height="28" rx="4" fill="#27272A"/>
+  <rect x="294" y="78" width="14" height="28" rx="4" fill="#27272A"/>
+
+  <!-- Full-Grain Italian Calfskin Boot Upper -->
+  <path d="M168 96 L304 96 L318 210 C358 238, 430 248, 468 268 C484 278, 486 304, 474 316 L152 316 C146 250, 156 168, 168 96 Z" fill="url(#calfskin)" stroke="#3B1B0A" stroke-width="2.5"/>
+
+  <!-- Elastic Side Gore Gusset -->
+  <path d="M204 98 L274 98 L268 222 C268 238, 208 238, 208 222 Z" fill="#27272A" stroke="#3B1B0A" stroke-width="2"/>
+  <line x1="224" y1="100" x2="224" y2="230" stroke="#3F3F46" stroke-width="2"/>
+  <line x1="240" y1="100" x2="240" y2="232" stroke="#3F3F46" stroke-width="2"/>
+  <line x1="256" y1="100" x2="256" y2="230" stroke="#3F3F46" stroke-width="2"/>
+
+  <!-- Specular Toe Shine -->
+  <path d="M350 248 C395 256, 440 265, 458 282" fill="none" stroke="#FFFFFF" stroke-opacity="0.28" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Goodyear Storm Welt Stitching + Vibram Lug Sole -->
+  <rect x="144" y="312" width="336" height="10" rx="3" fill="#B45309"/>
+  <line x1="150" y1="317" x2="474" y2="317" stroke="#FEF3C7" stroke-width="2" stroke-dasharray="5 4"/>
+  <!-- Stacked Heel & Lug Outsole -->
+  <path d="M144 322 L480 322 L476 338 L310 338 L310 330 L248 330 L248 346 L146 346 Z" fill="#18181B"/>
+</svg>

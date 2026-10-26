@@ -1,0 +1,6 @@
+{
+  "name": "Aura — Agentic Tech Commerce",
+  "description": "An AI-powered agentic commerce shopping assistant with autonomous purchase intent detection and instant PayPal Checkout integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

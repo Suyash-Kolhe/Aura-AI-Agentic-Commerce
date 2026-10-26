@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgEsp" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F6F4F0"/>
+      <stop offset="100%" stop-color="#DFD9CE"/>
+    </linearGradient>
+    <radialGradient id="shadowEsp" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#09090B" stop-opacity="0.28"/>
+      <stop offset="70%" stop-color="#09090B" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#09090B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="stainless" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#D4D4D8"/>
+      <stop offset="35%" stop-color="#F4F4F5"/>
+      <stop offset="65%" stop-color="#A1A1AA"/>
+      <stop offset="100%" stop-color="#71717A"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="450" fill="url(#bgEsp)"/>
+  <path d="M0 355 L600 355 L600 450 L0 450 Z" fill="#DED8CC"/>
+  <line x1="0" y1="355" x2="600" y2="355" stroke="#C8C0B2" stroke-width="1.5"/>
+
+  <ellipse cx="300" cy="374" rx="180" ry="22" fill="url(#shadowEsp)"/>
+
+  <!-- Conical Burr Tinted Bean Hopper -->
+  <polygon points="246,56 354,56 336,108 264,108" fill="#27272A" fill-opacity="0.78" stroke="#52525B" stroke-width="2"/>
+  <rect x="242" y="50" width="116" height="8" rx="3" fill="#18181B"/>
+  <!-- Coffee Beans in Hopper -->
+  <ellipse cx="300" cy="92" rx="32" ry="10" fill="#78350F"/>
+
+  <!-- Brushed Stainless Steel Dual-Boiler Chassis -->
+  <rect x="176" y="108" width="248" height="252" rx="14" fill="url(#stainless)" stroke="#71717A" stroke-width="2"/>
+  <!-- Recessed Brew Bay -->
+  <rect x="200" y="196" width="200" height="128" rx="8" fill="#27272A"/>
+
+  <!-- Top Control Fascia: Pressure Gauge + PID Display -->
+  <circle cx="256" cy="152" r="24" fill="#18181B" stroke="#E4E4E7" stroke-width="3"/>
+  <line x1="256" y1="152" x2="270" y2="138" stroke="#EF4444" stroke-width="2.5" stroke-linecap="round"/>
+  <rect x="304" y="138" width="76" height="28" rx="5" fill="#09090B" stroke="#52525B" stroke-width="1.5"/>
+  <text x="342" y="156" text-anchor="middle" fill="#F59E0B" font-family="monospace" font-weight="700" font-size="12">93°C · 9B</text>
+
+  <!-- Group Head & Walnut Portafilter Handle -->
+  <rect x="272" y="196" width="56" height="26" rx="4" fill="#52525B"/>
+  <rect x="318" y="204" width="96" height="12" rx="6" fill="#78350F" stroke="#451A03" stroke-width="1.5"/>
+  <!-- Dual Espresso Golden Crema Streams -->
+  <line x1="292" y1="222" x2="292" y2="268" stroke="#D97706" stroke-width="3"/>
+  <line x1="308" y1="222" x2="308" y2="268" stroke="#D97706" stroke-width="3"/>
+
+  <!-- Espresso Glass Cup on Drip Tray -->
+  <rect x="274" y="264" width="52" height="54" rx="6" fill="#FFFFFF" fill-opacity="0.22" stroke="#E4E4E7" stroke-width="2"/>
+  <rect x="277" y="280" width="46" height="35" rx="4" fill="#451A03"/>
+  <rect x="277" y="274" width="46" height="8" fill="#D97706"/>
+
+  <!-- Steam Wand -->
+  <path d="M222 198 L210 278 L218 284" fill="none" stroke="#E4E4E7" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- Stainless Drip Tray -->
+  <rect x="184" y="324" width="232" height="36" rx="6" fill="#52525B" stroke="#3F3F46" stroke-width="2"/>
+</svg>

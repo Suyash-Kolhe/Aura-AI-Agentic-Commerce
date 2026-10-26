@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgCoat" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F6F4F0"/>
+      <stop offset="100%" stop-color="#E3DEC8"/>
+    </linearGradient>
+    <radialGradient id="shadowCoat" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#09090B" stop-opacity="0.22"/>
+      <stop offset="70%" stop-color="#09090B" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#09090B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="merinoWool" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C89D66"/>
+      <stop offset="50%" stop-color="#A67B4B"/>
+      <stop offset="100%" stop-color="#7C5832"/>
+    </linearGradient>
+    <linearGradient id="lapelShade" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#B88B56"/>
+      <stop offset="100%" stop-color="#8A6238"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="450" fill="url(#bgCoat)"/>
+  <path d="M0 365 L600 365 L600 450 L0 450 Z" fill="#DED8CA"/>
+  <line x1="0" y1="365" x2="600" y2="365" stroke="#C9C1B0" stroke-width="1.5"/>
+
+  <ellipse cx="300" cy="390" rx="155" ry="20" fill="url(#shadowCoat)"/>
+
+  <!-- Tailored Overcoat Silhouette -->
+  <!-- Sleeves -->
+  <path d="M204 96 L138 272 L176 284 L222 142 Z" fill="url(#merinoWool)" stroke="#6B4C2B" stroke-width="2"/>
+  <path d="M396 96 L462 272 L424 284 L378 142 Z" fill="url(#merinoWool)" stroke="#6B4C2B" stroke-width="2"/>
+
+  <!-- Main Coat Body -->
+  <path d="M202 88 L258 72 L342 72 L398 88 L412 368 L188 368 Z" fill="url(#merinoWool)" stroke="#6B4C2B" stroke-width="2"/>
+
+  <!-- Inner Satin Lining & Knit Turtleneck Collar -->
+  <polygon points="262,72 338,72 300,192" fill="#27272A"/>
+  <rect x="272" y="56" width="56" height="22" rx="6" fill="#3F3F46"/>
+
+  <!-- Left & Right Tailored Notched Lapels -->
+  <polygon points="258,72 226,112 246,120 236,134 300,202 300,185" fill="url(#lapelShade)" stroke="#6B4C2B" stroke-width="1.8"/>
+  <polygon points="342,72 374,112 354,120 364,134 300,202 300,185" fill="url(#lapelShade)" stroke="#6B4C2B" stroke-width="1.8"/>
+
+  <!-- Center Placket & Horn Buttons -->
+  <line x1="300" y1="202" x2="300" y2="368" stroke="#6B4C2B" stroke-width="2"/>
+  <circle cx="290" cy="226" r="5.5" fill="#27272A" stroke="#D6B384" stroke-width="1.2"/>
+  <circle cx="290" cy="266" r="5.5" fill="#27272A" stroke="#D6B384" stroke-width="1.2"/>
+  <circle cx="290" cy="306" r="5.5" fill="#27272A" stroke="#D6B384" stroke-width="1.2"/>
+
+  <!-- Welt Pockets & Breast Pocket Square -->
+  <rect x="332" y="156" width="38" height="7" rx="2" fill="#6B4C2B"/>
+  <rect x="210" y="250" width="48" height="14" rx="3" fill="#8A6238" stroke="#6B4C2B" stroke-width="1.5"/>
+  <rect x="342" y="250" width="48" height="14" rx="3" fill="#8A6238" stroke="#6B4C2B" stroke-width="1.5"/>
+</svg>

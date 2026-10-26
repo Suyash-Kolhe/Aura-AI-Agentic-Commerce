@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5F3EF"/>
+      <stop offset="55%" stop-color="#EAE6DF"/>
+      <stop offset="100%" stop-color="#DDD7CD"/>
+    </linearGradient>
+    <radialGradient id="pedestal" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.22"/>
+      <stop offset="70%" stop-color="#000000" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="band" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#18181B"/>
+      <stop offset="30%" stop-color="#3F3F46"/>
+      <stop offset="50%" stop-color="#52525B"/>
+      <stop offset="70%" stop-color="#27272A"/>
+      <stop offset="100%" stop-color="#09090B"/>
+    </linearGradient>
+    <linearGradient id="cupOuter" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3F3F46"/>
+      <stop offset="45%" stop-color="#18181B"/>
+      <stop offset="100%" stop-color="#09090B"/>
+    </linearGradient>
+    <linearGradient id="brassAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E4D5B7"/>
+      <stop offset="50%" stop-color="#C5A880"/>
+      <stop offset="100%" stop-color="#8C7355"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Studio Travertine Backdrop -->
+  <rect width="600" height="450" fill="url(#bg)"/>
+  <path d="M0 340 L600 340 L600 450 L0 450 Z" fill="#E2DDD5"/>
+  <line x1="0" y1="340" x2="600" y2="340" stroke="#D0C9BE" stroke-width="1.5"/>
+
+  <!-- Soft Contact Shadow -->
+  <ellipse cx="300" cy="375" rx="170" ry="26" fill="url(#pedestal)"/>
+
+  <!-- Headband Arch -->
+  <path d="M168 235 C168 118, 432 118, 432 235" fill="none" stroke="url(#band)" stroke-width="28" stroke-linecap="round"/>
+  <path d="M178 225 C178 130, 422 130, 422 225" fill="none" stroke="#27272A" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- Telescoping Yoke Stems (Brushed Champagne Titanium) -->
+  <rect x="160" y="218" width="14" height="46" rx="5" fill="url(#brassAccent)" transform="rotate(-6 167 241)"/>
+  <rect x="426" y="218" width="14" height="46" rx="5" fill="url(#brassAccent)" transform="rotate(6 433 241)"/>
+
+  <!-- Left Ear Cushion (Plush Memory Foam) -->
+  <rect x="182" y="228" width="44" height="128" rx="22" fill="#27272A" transform="rotate(-8 204 292)"/>
+  <rect x="190" y="238" width="24" height="108" rx="12" fill="#09090B" transform="rotate(-8 202 292)"/>
+
+  <!-- Left Outer Anodized Ear Cup -->
+  <rect x="135" y="220" width="68" height="142" rx="34" fill="url(#cupOuter)" stroke="#52525B" stroke-width="1.5" transform="rotate(-8 169 291)"/>
+  <ellipse cx="163" cy="291" rx="20" ry="52" fill="none" stroke="url(#brassAccent)" stroke-width="1.5" stroke-opacity="0.7" transform="rotate(-8 163 291)"/>
+  <!-- ANC Mic Mesh -->
+  <rect x="150" y="255" width="6" height="22" rx="3" fill="url(#brassAccent)" transform="rotate(-8 153 266)"/>
+
+  <!-- Right Ear Cushion (Plush Memory Foam) -->
+  <rect x="374" y="228" width="44" height="128" rx="22" fill="#27272A" transform="rotate(8 396 292)"/>
+  <rect x="386" y="238" width="24" height="108" rx="12" fill="#09090B" transform="rotate(8 398 292)"/>
+
+  <!-- Right Outer Anodized Ear Cup -->
+  <rect x="397" y="220" width="68" height="142" rx="34" fill="url(#cupOuter)" stroke="#52525B" stroke-width="1.5" transform="rotate(8 431 291)"/>
+  <ellipse cx="437" cy="291" rx="20" ry="52" fill="none" stroke="url(#brassAccent)" stroke-width="1.5" stroke-opacity="0.7" transform="rotate(8 437 291)"/>
+  <rect x="444" y="255" width="6" height="22" rx="3" fill="url(#brassAccent)" transform="rotate(8 447 266)"/>
+</svg>

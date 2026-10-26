@@ -1,0 +1,113 @@
+@import "@fontsource/geist-sans";
+@import "https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap";
+@import "tailwindcss";
+
+:root {
+  --background: 260 87% 3%;
+  --foreground: 40 6% 95%;
+  --hero-sub: 40 6% 82%;
+}
+
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-hero-sub: hsl(var(--hero-sub));
+  --font-sans: 'Geist Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-headline: 'General Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: 'Geist Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+.font-general {
+  font-family: 'General Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.text-foreground {
+  color: hsl(var(--foreground));
+}
+
+.text-hero-sub {
+  color: hsl(var(--hero-sub));
+}
+
+.bg-background {
+  background-color: hsl(var(--background));
+}
+
+/* Liquid glass utility class */
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.01);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.15) 20%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.15) 80%, rgba(255,255,255,0.45) 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* HeroSecondary button variant */
+.heroSecondary,
+.btn-hero-secondary {
+  background: rgba(255, 255, 255, 0.03);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 4px 20px rgba(0, 0, 0, 0.4);
+  color: hsl(var(--foreground));
+  font-weight: 500;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.heroSecondary:hover,
+.btn-hero-secondary:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3), 0 6px 25px rgba(0, 0, 0, 0.5);
+  transform: translateY(-1px);
+}
+
+.heroSecondary:active,
+.btn-hero-secondary:active {
+  transform: translateY(0px);
+}
+
+/* Marquee keyframe animation */
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee-infinite {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 20s linear infinite;
+}
+
+.animate-marquee-infinite:hover {
+  animation-play-state: paused;
+}

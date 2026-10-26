@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgGlass" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F6F5F2"/>
+      <stop offset="100%" stop-color="#E2DFD9"/>
+    </linearGradient>
+    <radialGradient id="shadowGlass" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#09090B" stop-opacity="0.22"/>
+      <stop offset="70%" stop-color="#09090B" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#09090B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="lensTint" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#1E293B" stop-opacity="0.82"/>
+      <stop offset="100%" stop-color="#0284C7" stop-opacity="0.45"/>
+    </linearGradient>
+    <linearGradient id="waveguide" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#34D399" stop-opacity="0.5"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="450" fill="url(#bgGlass)"/>
+  <path d="M0 345 L600 345 L600 450 L0 450 Z" fill="#DEDAD2"/>
+  <line x1="0" y1="345" x2="600" y2="345" stroke="#CBC5BA" stroke-width="1.5"/>
+
+  <ellipse cx="300" cy="365" rx="210" ry="20" fill="url(#shadowGlass)"/>
+
+  <!-- Rear Acoustic Temples -->
+  <path d="M105 215 L195 148 C210 138, 228 142, 235 154" fill="none" stroke="#27272A" stroke-width="12" stroke-linecap="round"/>
+  <path d="M495 215 L405 148 C390 138, 372 142, 365 154" fill="none" stroke="#27272A" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- Anodized Magnesium Top Brow Bar -->
+  <path d="M92 212 C180 202, 250 206, 300 214 C350 206, 420 202, 508 212" fill="none" stroke="#18181B" stroke-width="14" stroke-linecap="round"/>
+
+  <!-- Left AR Waveguide Lens -->
+  <rect x="104" y="210" width="166" height="106" rx="26" fill="url(#lensTint)" stroke="#27272A" stroke-width="7"/>
+  <!-- Right AR Waveguide Lens -->
+  <rect x="330" y="210" width="166" height="106" rx="26" fill="url(#lensTint)" stroke="#27272A" stroke-width="7"/>
+
+  <!-- Titanium Nose Bridge -->
+  <path d="M270 236 C285 224, 315 224, 330 236" fill="none" stroke="#52525B" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Micro-OLED Spatial HUD Projection Graphics inside Lenses -->
+  <rect x="132" y="236" width="110" height="54" rx="8" fill="none" stroke="url(#waveguide)" stroke-width="1.8" stroke-dasharray="4 2"/>
+  <line x1="144" y1="252" x2="210" y2="252" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="144" y1="266" x2="188" y2="266" stroke="#34D399" stroke-width="2.5" stroke-linecap="round"/>
+
+  <rect x="358" y="236" width="110" height="54" rx="8" fill="none" stroke="url(#waveguide)" stroke-width="1.8" stroke-dasharray="4 2"/>
+  <line x1="370" y1="252" x2="436" y2="252" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round"/>
+  <line x1="370" y1="266" x2="414" y2="266" stroke="#34D399" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Specular Studio Rim Highlight -->
+  <path d="M122 222 L235 222" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="3" stroke-linecap="round"/>
+  <path d="M348 222 L461 222" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="3" stroke-linecap="round"/>
+</svg>

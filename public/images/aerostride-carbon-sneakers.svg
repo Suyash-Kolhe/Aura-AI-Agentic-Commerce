@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgRun" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F4F6F8"/>
+      <stop offset="100%" stop-color="#DCE3EB"/>
+    </linearGradient>
+    <radialGradient id="shadowRun" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#09090B" stop-opacity="0.28"/>
+      <stop offset="70%" stop-color="#09090B" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#09090B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="meshUpper" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0EA5E9"/>
+      <stop offset="55%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#1E1B4B"/>
+    </linearGradient>
+    <linearGradient id="nitroFoam" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="65%" stop-color="#F1F5F9"/>
+      <stop offset="100%" stop-color="#34D399"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="450" fill="url(#bgRun)"/>
+  <path d="M0 345 L600 345 L600 450 L0 450 Z" fill="#D5DDE6"/>
+  <line x1="0" y1="345" x2="600" y2="345" stroke="#BFC9D6" stroke-width="1.5"/>
+
+  <ellipse cx="305" cy="362" rx="225" ry="22" fill="url(#shadowRun)"/>
+
+  <!-- Engineered Breathable Mesh Upper -->
+  <path d="M126 278 C124 222, 152 162, 185 156 C210 188, 255 190, 282 142 L386 218 C432 232, 482 242, 496 278 Z" fill="url(#meshUpper)" stroke="#1E3A8A" stroke-width="2"/>
+
+  <!-- Aerodynamic Speed Stripe -->
+  <path d="M168 252 L348 214 L318 248 L156 268 Z" fill="#34D399"/>
+  <path d="M210 265 L392 236 L372 256 Z" fill="#FFFFFF" fill-opacity="0.85"/>
+
+  <!-- Laces & Tongue -->
+  <g stroke="#FFFFFF" stroke-width="4" stroke-linecap="round">
+    <line x1="292" y1="158" x2="312" y2="148"/>
+    <line x1="314" y1="174" x2="334" y2="164"/>
+    <line x1="336" y1="190" x2="356" y2="180"/>
+    <line x1="358" y1="206" x2="378" y2="196"/>
+  </g>
+
+  <!-- Supercritical Nitrogen Foam Midsole + Carbon Fiber Plate Window -->
+  <path d="M104 276 L504 276 C518 276, 524 304, 498 322 L134 328 C104 328, 92 298, 104 276 Z" fill="url(#nitroFoam)" stroke="#CBD5E1" stroke-width="2"/>
+  <!-- Exposed Full-Length Carbon Plate Channel -->
+  <path d="M152 302 C240 292, 360 294, 464 306" fill="none" stroke="#18181B" stroke-width="8" stroke-linecap="round"/>
+  <path d="M158 302 C240 292, 360 294, 458 306" fill="none" stroke="#34D399" stroke-width="2" stroke-dasharray="6 4" stroke-linecap="round"/>
+
+  <!-- High-Traction Rubber Outsole -->
+  <path d="M128 328 L492 322 L482 334 L138 338 Z" fill="#09090B"/>
+</svg>

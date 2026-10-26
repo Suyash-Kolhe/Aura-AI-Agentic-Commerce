@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgParfum" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F6F3EE"/>
+      <stop offset="100%" stop-color="#E2DACB"/>
+    </linearGradient>
+    <radialGradient id="shadowParfum" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#09090B" stop-opacity="0.26"/>
+      <stop offset="70%" stop-color="#09090B" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#09090B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="amberJuice" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FBBF24" stop-opacity="0.82"/>
+      <stop offset="55%" stop-color="#D97706" stop-opacity="0.88"/>
+      <stop offset="100%" stop-color="#92400E" stop-opacity="0.92"/>
+    </linearGradient>
+    <linearGradient id="ebonyCap" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#27272A"/>
+      <stop offset="45%" stop-color="#3F3F46"/>
+      <stop offset="100%" stop-color="#09090B"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="450" fill="url(#bgParfum)"/>
+  <path d="M0 355 L600 355 L600 450 L0 450 Z" fill="#DED5C5"/>
+  <line x1="0" y1="355" x2="600" y2="355" stroke="#C8BDAA" stroke-width="1.5"/>
+
+  <ellipse cx="300" cy="378" rx="135" ry="20" fill="url(#shadowParfum)"/>
+
+  <!-- Heavy Cedarwood & Ebony Cylindrical Cap -->
+  <rect x="262" y="64" width="76" height="62" rx="8" fill="url(#ebonyCap)" stroke="#52525B" stroke-width="1.5"/>
+  <!-- Gold Atomizer Neck -->
+  <rect x="278" y="126" width="44" height="22" fill="#D97706" stroke="#FEF08A" stroke-width="1.5"/>
+
+  <!-- Thick Architectural Crystal Flacon Outer Walls -->
+  <rect x="210" y="148" width="180" height="224" rx="16" fill="#FFFFFF" fill-opacity="0.65" stroke="#D6D3D1" stroke-width="3"/>
+  <!-- Amber-Gold Santal Parfum Liquid Chamber -->
+  <rect x="224" y="172" width="152" height="178" rx="10" fill="url(#amberJuice)"/>
+  <!-- Heavy Crystal Base -->
+  <rect x="214" y="350" width="172" height="20" rx="6" fill="#E7E5E4" fill-opacity="0.85"/>
+
+  <!-- Internal Atomizer Dip Tube -->
+  <path d="M300 148 Q304 250 326 346" fill="none" stroke="#FFFFFF" stroke-opacity="0.55" stroke-width="3"/>
+
+  <!-- Apothecary Textured Paper Label -->
+  <rect x="236" y="208" width="128" height="104" rx="4" fill="#FAF8F5" stroke="#27272A" stroke-width="1.5"/>
+  <text x="300" y="236" text-anchor="middle" fill="#18181B" font-family="monospace" font-weight="700" font-size="15" letter-spacing="1.5">SANTAL &amp; CEDAR</text>
+  <line x1="252" y1="246" x2="348" y2="246" stroke="#A1A1AA" stroke-width="1"/>
+  <text x="300" y="264" text-anchor="middle" fill="#3F3F46" font-family="monospace" font-size="9.5">EAU DE PARFUM · 100ML</text>
+  <text x="300" y="280" text-anchor="middle" fill="#71717A" font-family="monospace" font-size="8.5">NATURAL SPRAY · PARIS</text>
+  <text x="300" y="298" text-anchor="middle" fill="#18181B" font-family="monospace" font-weight="700" font-size="8.5">BOTANICAL EXTRACTS</text>
+</svg>

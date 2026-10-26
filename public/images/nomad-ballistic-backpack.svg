@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgPack" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F6F4F0"/>
+      <stop offset="100%" stop-color="#E2DDD2"/>
+    </linearGradient>
+    <radialGradient id="shadowPack" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#09090B" stop-opacity="0.28"/>
+      <stop offset="70%" stop-color="#09090B" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#09090B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="corduraNylon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3F3F46"/>
+      <stop offset="50%" stop-color="#27272A"/>
+      <stop offset="100%" stop-color="#18181B"/>
+    </linearGradient>
+    <linearGradient id="saddleLeather" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A16207"/>
+      <stop offset="50%" stop-color="#78350F"/>
+      <stop offset="100%" stop-color="#451A03"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="450" fill="url(#bgPack)"/>
+  <path d="M0 355 L600 355 L600 450 L0 450 Z" fill="#DDD7CA"/>
+  <line x1="0" y1="355" x2="600" y2="355" stroke="#C8C0B0" stroke-width="1.5"/>
+
+  <ellipse cx="300" cy="378" rx="160" ry="22" fill="url(#shadowPack)"/>
+
+  <!-- Leather Top Haul Handle -->
+  <path d="M262 84 C262 52, 338 52, 338 84" fill="none" stroke="url(#saddleLeather)" stroke-width="12" stroke-linecap="round"/>
+
+  <!-- Side Modular Water Bottle Pockets -->
+  <rect x="176" y="236" width="24" height="106" rx="10" fill="#18181B" stroke="#3F3F46" stroke-width="1.5"/>
+  <rect x="400" y="236" width="24" height="106" rx="10" fill="#18181B" stroke="#3F3F46" stroke-width="1.5"/>
+
+  <!-- Main 1680D Ballistic Nylon Pack Body -->
+  <path d="M196 128 C196 90, 232 76, 300 76 C368 76, 404 90, 404 128 L412 346 C412 362, 398 372, 380 372 L220 372 C202 372, 188 362, 188 346 Z" fill="url(#corduraNylon)" stroke="#52525B" stroke-width="2.5"/>
+
+  <!-- YKK AquaGuard Waterproof Zipper Track -->
+  <path d="M214 148 C214 114, 386 114, 386 148" fill="none" stroke="#09090B" stroke-width="6"/>
+  <rect x="294" y="116" width="12" height="18" rx="3" fill="#D97706"/>
+
+  <!-- Full-Grain Saddle Leather Lower Front Vault Panel -->
+  <rect x="210" y="218" width="180" height="134" rx="16" fill="url(#saddleLeather)" stroke="#92400E" stroke-width="2"/>
+  <line x1="224" y1="246" x2="376" y2="246" stroke="#18181B" stroke-width="5"/>
+  <!-- Debossed Leather Crest -->
+  <rect x="274" y="284" width="52" height="22" rx="3" fill="#451A03" stroke="#D97706" stroke-width="1"/>
+  <text x="300" y="298" text-anchor="middle" fill="#FDE68A" font-family="sans-serif" font-weight="700" font-size="8.5" letter-spacing="1.5">NOMAD</text>
+</svg>

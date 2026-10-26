@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgSerum" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F8F4F6"/>
+      <stop offset="100%" stop-color="#E7DCE4"/>
+    </linearGradient>
+    <radialGradient id="shadowSerum" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#09090B" stop-opacity="0.24"/>
+      <stop offset="70%" stop-color="#09090B" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#09090B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="frostedGlass" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F472B6" stop-opacity="0.85"/>
+      <stop offset="50%" stop-color="#C084FC" stop-opacity="0.88"/>
+      <stop offset="100%" stop-color="#7E22CE" stop-opacity="0.92"/>
+    </linearGradient>
+    <linearGradient id="goldCollar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FDE68A"/>
+      <stop offset="50%" stop-color="#D97706"/>
+      <stop offset="100%" stop-color="#92400E"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="450" fill="url(#bgSerum)"/>
+  <path d="M0 355 L600 355 L600 450 L0 450 Z" fill="#E1D4DD"/>
+  <line x1="0" y1="355" x2="600" y2="355" stroke="#CDBDC8" stroke-width="1.5"/>
+
+  <ellipse cx="300" cy="378" rx="115" ry="18" fill="url(#shadowSerum)"/>
+
+  <!-- Rubber Pipette Dropper Bulb -->
+  <path d="M276 64 C276 38, 324 38, 324 64 L328 112 L272 112 Z" fill="#FAFAFA" stroke="#D4D4D8" stroke-width="2"/>
+
+  <!-- Brushed Gold Metallic Collar -->
+  <rect x="262" y="110" width="76" height="36" rx="5" fill="url(#goldCollar)" stroke="#FEF3C7" stroke-width="1.5"/>
+  <line x1="262" y1="122" x2="338" y2="122" stroke="#92400E" stroke-width="1.5"/>
+
+  <!-- Frosted Violet-Rose Glass Apothecary Bottle -->
+  <path d="M262 146 L338 146 C362 162, 368 184, 368 208 L368 352 C368 366, 356 374, 342 374 L258 374 C244 374, 232 366, 232 352 L232 208 C232 184, 238 162, 262 146 Z" fill="url(#frostedGlass)" stroke="#F9A8D4" stroke-width="2"/>
+
+  <!-- Internal Glass Pipette Tube Visible Through Frosted Bottle -->
+  <rect x="295" y="146" width="10" height="190" rx="4" fill="#FFFFFF" fill-opacity="0.35"/>
+
+  <!-- Minimalist Luxury Apothecary Label -->
+  <rect x="246" y="212" width="108" height="118" rx="6" fill="#FAF8F5" stroke="#FDE68A" stroke-width="1.5"/>
+  <text x="300" y="242" text-anchor="middle" fill="#18181B" font-family="serif" font-weight="700" font-size="16" letter-spacing="2">LUMIÈRE</text>
+  <line x1="268" y1="252" x2="332" y2="252" stroke="#D97706" stroke-width="1"/>
+  <text x="300" y="272" text-anchor="middle" fill="#7E22CE" font-family="sans-serif" font-weight="700" font-size="9" letter-spacing="1">2% HYALURONIC</text>
+  <text x="300" y="286" text-anchor="middle" fill="#52525B" font-family="sans-serif" font-size="8.5" letter-spacing="0.8">+ COPPER PEPTIDES</text>
+  <text x="300" y="314" text-anchor="middle" fill="#71717A" font-family="monospace" font-size="8">30 ML · 1.0 FL. OZ.</text>
+
+  <!-- Specular Glass Rim Highlight -->
+  <line x1="244" y1="196" x2="244" y2="348" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="5" stroke-linecap="round"/>
+</svg>

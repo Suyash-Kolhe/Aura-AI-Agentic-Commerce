@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgLug" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F4F6F8"/>
+      <stop offset="100%" stop-color="#DDE2EA"/>
+    </linearGradient>
+    <radialGradient id="shadowLug" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#09090B" stop-opacity="0.28"/>
+      <stop offset="70%" stop-color="#09090B" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#09090B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="makrolonShell" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="50%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="450" fill="url(#bgLug)"/>
+  <path d="M0 365 L600 365 L600 450 L0 450 Z" fill="#D5DCE6"/>
+  <line x1="0" y1="365" x2="600" y2="365" stroke="#BFC8D6" stroke-width="1.5"/>
+
+  <ellipse cx="300" cy="390" rx="145" ry="18" fill="url(#shadowLug)"/>
+
+  <!-- Telescoping Aluminum Trolley Handle -->
+  <rect x="268" y="48" width="8" height="68" fill="#94A3B8"/>
+  <rect x="324" y="48" width="8" height="68" fill="#94A3B8"/>
+  <rect x="260" y="40" width="80" height="14" rx="5" fill="#18181B" stroke="#64748B" stroke-width="1.5"/>
+
+  <!-- Makrolon Polycarbonate Hardshell Body -->
+  <rect x="206" y="108" width="188" height="248" rx="24" fill="url(#makrolonShell)" stroke="#475569" stroke-width="2.5"/>
+
+  <!-- Brushed Aluminum Corner Impact Guards -->
+  <path d="M206 132 C206 116, 216 108, 232 108 L244 108 L244 138 L206 138 Z" fill="#94A3B8"/>
+  <path d="M394 132 C394 116, 384 108, 368 108 L356 108 L356 138 L394 138 Z" fill="#94A3B8"/>
+
+  <!-- Aerospace Horizontal Compression Ribs -->
+  <g stroke="#64748B" stroke-width="3" stroke-linecap="round">
+    <line x1="226" y1="156" x2="374" y2="156"/>
+    <line x1="226" y1="184" x2="374" y2="184"/>
+    <line x1="226" y1="212" x2="374" y2="212"/>
+    <line x1="226" y1="240" x2="374" y2="240"/>
+    <line x1="226" y1="268" x2="374" y2="268"/>
+    <line x1="226" y1="296" x2="374" y2="296"/>
+    <line x1="226" y1="324" x2="374" y2="324"/>
+  </g>
+
+  <!-- Center Brand Crest -->
+  <rect x="276" y="172" width="48" height="24" rx="4" fill="#0F172A" stroke="#38BDF8" stroke-width="1.5"/>
+  <text x="300" y="187" text-anchor="middle" fill="#38BDF8" font-family="sans-serif" font-weight="700" font-size="8" letter-spacing="1.5">VOYAGER</text>
+
+  <!-- 4 Hinomoto 360° Silent Spinner Wheels -->
+  <rect x="224" y="356" width="16" height="14" rx="3" fill="#18181B"/>
+  <circle cx="232" cy="376" r="11" fill="#09090B" stroke="#94A3B8" stroke-width="3"/>
+
+  <rect x="360" y="356" width="16" height="14" rx="3" fill="#18181B"/>
+  <circle cx="368" cy="376" r="11" fill="#09090B" stroke="#94A3B8" stroke-width="3"/>
+</svg>

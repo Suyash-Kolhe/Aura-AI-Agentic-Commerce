@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgGun" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F4F6F8"/>
+      <stop offset="100%" stop-color="#DCE2E8"/>
+    </linearGradient>
+    <radialGradient id="shadowGun" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#09090B" stop-opacity="0.25"/>
+      <stop offset="70%" stop-color="#09090B" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#09090B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="gunmetal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3F3F46"/>
+      <stop offset="50%" stop-color="#27272A"/>
+      <stop offset="100%" stop-color="#09090B"/>
+    </linearGradient>
+    <radialGradient id="sphereHead" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#52525B"/>
+      <stop offset="55%" stop-color="#27272A"/>
+      <stop offset="100%" stop-color="#09090B"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="600" height="450" fill="url(#bgGun)"/>
+  <path d="M0 355 L600 355 L600 450 L0 450 Z" fill="#D5DCE4"/>
+  <line x1="0" y1="355" x2="600" y2="355" stroke="#BFC8D2" stroke-width="1.5"/>
+
+  <ellipse cx="290" cy="378" rx="165" ry="20" fill="url(#shadowGun)"/>
+
+  <!-- Angled Ergonomic Battery Handle -->
+  <path d="M232 184 L288 184 L254 366 C252 374, 242 378, 232 378 L206 378 C196 378, 190 370, 194 360 Z" fill="url(#gunmetal)" stroke="#52525B" stroke-width="2"/>
+  <!-- Silicone Grip Texture & Glowing Battery Ring -->
+  <path d="M222 232 L272 232 L252 342 L202 342 Z" fill="#18181B"/>
+  <line x1="201" y1="348" x2="256" y2="348" stroke="#34D399" stroke-width="3.5"/>
+
+  <!-- Brushless QuietGlide Motor Barrel -->
+  <rect x="166" y="106" width="212" height="86" rx="28" fill="url(#gunmetal)" stroke="#52525B" stroke-width="2.5"/>
+  <!-- Cyan Cooling Vent Ring -->
+  <rect x="342" y="108" width="10" height="82" rx="3" fill="#38BDF8"/>
+  <!-- Rear OLED Speed Indicator -->
+  <circle cx="204" cy="149" r="22" fill="#09090B" stroke="#38BDF8" stroke-width="2.5"/>
+  <text x="204" y="153" text-anchor="middle" fill="#38BDF8" font-family="monospace" font-weight="700" font-size="11">2400</text>
+
+  <!-- 16mm Amplitude Piston Rod & Spherical Titanium/Silicone Head -->
+  <rect x="378" y="136" width="46" height="26" fill="#A1A1AA" stroke="#52525B" stroke-width="1.5"/>
+  <circle cx="458" cy="149" r="42" fill="url(#sphereHead)" stroke="#3F3F46" stroke-width="2"/>
+</svg>

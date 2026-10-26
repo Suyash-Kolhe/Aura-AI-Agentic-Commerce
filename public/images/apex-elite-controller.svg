@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="600" height="450">
+  <defs>
+    <linearGradient id="bgPad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F4F5F8"/>
+      <stop offset="100%" stop-color="#DDE0EC"/>
+    </linearGradient>
+    <radialGradient id="shadowPad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#09090B" stop-opacity="0.28"/>
+      <stop offset="70%" stop-color="#09090B" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#09090B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="padShell" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#312E81"/>
+      <stop offset="50%" stop-color="#1E1B4B"/>
+      <stop offset="100%" stop-color="#09090B"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="600" height="450" fill="url(#bgPad)"/>
+  <path d="M0 350 L600 350 L600 450 L0 450 Z" fill="#D6DAE8"/>
+  <line x1="0" y1="350" x2="600" y2="350" stroke="#BFC5D8" stroke-width="1.5"/>
+
+  <ellipse cx="300" cy="368" rx="195" ry="22" fill="url(#shadowPad)"/>
+
+  <!-- Top Metallic Triggers -->
+  <path d="M178 122 Q215 104 248 122 L248 140 L178 140 Z" fill="#71717A"/>
+  <path d="M352 122 Q385 104 422 122 L422 140 L352 140 Z" fill="#71717A"/>
+
+  <!-- Ergonomic Wireless Pro Controller Body -->
+  <path d="M174 132 L426 132 C458 132, 480 162, 488 214 L498 302 C502 336, 470 356, 444 338 L384 276 L216 276 L156 338 C130 356, 98 336, 102 302 L112 214 C120 162, 142 132, 174 132 Z" fill="url(#padShell)" stroke="#6366F1" stroke-width="2.5"/>
+
+  <!-- Textured Rubberized Grips -->
+  <path d="M114 218 L156 266 L142 332 C120 338, 104 322, 106 296 Z" fill="#18181B"/>
+  <path d="M486 218 L444 266 L458 332 C480 338, 496 322, 494 296 Z" fill="#18181B"/>
+
+  <!-- Glowing Home Crest -->
+  <circle cx="300" cy="164" r="14" fill="#09090B" stroke="#38BDF8" stroke-width="2.5"/>
+  <polygon points="300,155 308,169 292,169" fill="#38BDF8"/>
+
+  <!-- Left Metal Thumbstick -->
+  <circle cx="204" cy="192" r="26" fill="#09090B" stroke="#38BDF8" stroke-width="2.5"/>
+  <circle cx="204" cy="192" r="16" fill="#3F3F46"/>
+
+  <!-- Faceted Octagonal Stainless D-Pad -->
+  <circle cx="248" cy="242" r="24" fill="#27272A" stroke="#71717A" stroke-width="2"/>
+  <path d="M242 222 H254 V262 H242 Z M228 236 H268 V248 H228 Z" fill="#A1A1AA"/>
+
+  <!-- Right Metal Thumbstick -->
+  <circle cx="352" cy="242" r="26" fill="#09090B" stroke="#818CF8" stroke-width="2.5"/>
+  <circle cx="352" cy="242" r="16" fill="#3F3F46"/>
+
+  <!-- Optical Micro-Switch ABXY Buttons -->
+  <circle cx="404" cy="166" r="9" fill="#18181B" stroke="#FBBF24" stroke-width="2"/>
+  <circle cx="426" cy="188" r="9" fill="#18181B" stroke="#EF4444" stroke-width="2"/>
+  <circle cx="382" cy="188" r="9" fill="#18181B" stroke="#38BDF8" stroke-width="2"/>
+  <circle cx="404" cy="210" r="9" fill="#18181B" stroke="#34D399" stroke-width="2"/>
+</svg>

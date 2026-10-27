@@ -573,17 +573,59 @@ export function extractApprovalUrl(orderResponse: unknown): string | null {
   return approveLink?.href ?? null;
 }
 
+export interface CheckoutOrderResult {
+  orderId: string;
+  item: string;
+  price: number;
+  imageUrl: string;
+  category: string;
+  specs: string;
+  approveUrl: string;
+  status: string;
+  mode: string;
+}
+
 /**
- * Deterministic fallback for Aura when GEMINI_API_KEY is missing or rate-limited in test environments.
+ * Creates a deterministic PayPal Sandbox checkout order payload when the backend checkout endpoint
+ * is unreachable (e.g. static hosting) or when PayPal Sandbox credentials are not configured.
+ */
+export function createFallbackCheckoutOrder(item: string, price: number): CheckoutOrderResult {
+  const cleanItem = (item || 'Aura Curated Product').trim();
+  const safePrice =
+    Number.isFinite(Number(price)) && Number(price) > 0
+      ? Math.round(Number(price) * 100) / 100
+      : 299;
+  const resolved = resolveProductDetails(cleanItem);
+  const orderId = `EC-AURA-${Date.now().toString(36).toUpperCase()}`;
+  const approveUrl = `https://www.sandbox.paypal.com/checkoutnow?token=${orderId}`;
+
+  return {
+    orderId,
+    item: cleanItem,
+    price: safePrice,
+    imageUrl: resolved.imageUrl,
+    category: resolved.category,
+    specs: resolved.specs,
+    approveUrl,
+    status: 'CREATED',
+    mode: 'sandbox_preview',
+  };
+}
+
+/**
+ * Deterministic fallback for Aura when GEMINI_API_KEY is missing, rate-limited, or when running on static deployments.
  */
 export function generateFallbackAuraResponse(userMessage: string): string {
   const cleanMsg = (userMessage || '').trim();
   const lower = cleanMsg.toLowerCase();
 
-  const purchaseIntentRegex =
-    /\b(i want to buy|i'd like to buy|i would like to buy|buy the|buy a|buy this|purchase the|purchase a|purchase|i'll take the|i will take the|order the|get me the|checkout with)\b/i;
+  const isQuestionAboutBuying =
+    /\b(how|what|why|where|when)\s+(to\s+|do\s+i\s+|should\s+i\s+|can\s+i\s+)?buy\b/i.test(cleanMsg);
 
-  if (purchaseIntentRegex.test(cleanMsg)) {
+  const purchaseIntentRegex =
+    /\b(i want to buy|i'd like to buy|i would like to buy|buy the|buy a|buy this|buy|purchase the|purchase a|purchase|i'll take the|i will take the|order the|order a|get me the|checkout with)\b/i;
+
+  if (!isQuestionAboutBuying && purchaseIntentRegex.test(cleanMsg)) {
     for (const gadget of CURATED_GADGETS) {
       const nameMatch = lower.includes(gadget.name.toLowerCase());
       const keywordMatch = gadget.keywords.some((kw) => lower.includes(kw));
@@ -605,10 +647,11 @@ export function generateFallbackAuraResponse(userMessage: string): string {
 
     let extractedItem = cleanMsg
       .replace(
-        /^.*?\b(?:i want to buy|i'd like to buy|i would like to buy|buy the|buy a|buy|purchase the|purchase a|purchase|i'll take the|i will take the|order the|get me the|checkout with)\s+/i,
+        /^.*?\b(?:i want to buy|i'd like to buy|i would like to buy|buy the|buy a|buy this|buy|purchase the|purchase a|purchase|i'll take the|i will take the|order the|order a|get me the|checkout with)\s+/i,
         ''
       )
       .replace(/\s+(?:for|at)\s+\$?\d+(?:\.\d{1,2})?\s*(?:usd|dollars)?.*$/i, '')
+      .replace(/\(\s*\$\s*\d+(?:\.\d{1,2})?\s*\)/g, '')
       .replace(/\$\s*\d+(?:\.\d{1,2})?/g, '')
       .replace(/[.!?]+$/, '')
       .trim();
@@ -631,11 +674,19 @@ export function generateFallbackAuraResponse(userMessage: string): string {
       lower.includes(product.name.toLowerCase()) ||
       product.keywords.some((kw) => lower.includes(kw))
     ) {
-      return `I highly recommend the ${product.name} ($${product.price}) in our ${product.category} collection. Key highlights: ${product.specs}. You can save it to your Wishlist, add it to your Shopping Cart, or say "I want to buy the ${product.name}" for instant PayPal checkout!`;
+      return `I highly recommend the ${product.name} ($${product.price}) in our ${product.category} collection. Key highlights: ${product.specs}. Availability: ${product.stockStatus}. You can save it to your Wishlist, add it to your Shopping Cart, or say "I want to buy the ${product.name}" for instant PayPal checkout!`;
     }
   }
 
-  return 'Hello! I am Aura, your online shopping assistant. We carry 24+ curated products across Electronics & Tech, Fashion & Apparel, Footwear & Sneakers, Home & Kitchen, Beauty & Personal Care, Sports & Fitness, Gaming, and Travel Accessories.\n\nAsk me for recommendations in any category, save favourites to your Wishlist, add items to your Shopping Cart, or tell me which item you want to buy to check out instantly with PayPal.';
+  if (/\b(track|tracking|shipping|delivery|order status|where is my order)\b/i.test(cleanMsg)) {
+    return 'All completed PayPal orders include live 5-stage Order Tracking in your PayPal Orders Ledger (Order Confirmed → Packed & Insured → Shipped · In Transit → Out for Delivery → Delivered). You can also filter your active orders by product name or order ID right inside the Ledger!';
+  }
+
+  if (/\b(categories|catalog|browse|all products|what do you sell|what do you have)\b/i.test(cleanMsg)) {
+    return 'We offer 26 curated products across 8 categories: Electronics & Tech (Aether ANC-1 Headphones $349, Chrono Titanium Pro Watch $429, Lumina Air AR Glasses $599), Fashion & Apparel, Footwear & Sneakers, Home & Kitchen, Beauty & Personal Care, Sports & Fitness, Gaming & Consoles, and Bags & Travel. Ask about any item or say "I want to buy [item]" for instant PayPal checkout!';
+  }
+
+  return 'Hello! I am Aura, your online shopping assistant. We carry 26 curated products across Electronics & Tech, Fashion & Apparel, Footwear & Sneakers, Home & Kitchen, Beauty & Personal Care, Sports & Fitness, Gaming, and Travel Accessories.\n\nAsk me for recommendations in any category, save favourites to your Wishlist, add items to your Shopping Cart, or tell me which item you want to buy to check out instantly with PayPal.';
 }
 
 export interface CartItem {

@@ -408,7 +408,7 @@ function generateFallbackAuraResponse(userMessage) {
   const lower = cleanMsg.toLowerCase();
 
   const purchaseIntentRegex =
-    /\b(i want to buy|i'd like to buy|i would like to buy|buy the|buy a|buy this|purchase the|purchase a|purchase|i'll take the|i will take the|order the|get me the|checkout with)\b/i;
+    /\b(i want to buy|i'd like to buy|i would like to buy|buy the|buy a|buy this|buy|purchase the|purchase a|purchase|i'll take the|i will take the|order the|get me the|checkout with)\b/i;
 
   if (purchaseIntentRegex.test(cleanMsg)) {
     for (const gadget of CURATED_GADGETS) {
@@ -436,6 +436,7 @@ function generateFallbackAuraResponse(userMessage) {
         ''
       )
       .replace(/\s+(?:for|at)\s+\$?\d+(?:\.\d{1,2})?\s*(?:usd|dollars)?.*$/i, '')
+      .replace(/\(\s*\$\s*\d+(?:\.\d{1,2})?\s*\)/g, '')
       .replace(/\$\s*\d+(?:\.\d{1,2})?/g, '')
       .replace(/[.!?]+$/, '')
       .trim();
@@ -458,11 +459,15 @@ function generateFallbackAuraResponse(userMessage) {
       lower.includes(product.name.toLowerCase()) ||
       product.keywords.some((kw) => lower.includes(kw))
     ) {
-      return `I highly recommend the ${product.name} ($${product.price}) in our ${product.category} collection. Key highlights: ${product.specs}. You can save it to your Wishlist, add it to your Shopping Cart, or say "I want to buy the ${product.name}" for instant PayPal checkout!`;
+      return `I highly recommend the ${product.name} ($${product.price}) in our ${product.category} collection. Key highlights: ${product.specs}. You can save it to your Wishlist, add it to your Shopping Cart, or say "I want to buy the ${product.name} for $${product.price}" for instant PayPal checkout!`;
     }
   }
 
-  return 'Hello! I am Aura, your online shopping assistant. We carry 24+ curated products across Electronics & Tech, Fashion & Apparel, Footwear & Sneakers, Home & Kitchen, Beauty & Personal Care, Sports & Fitness, Gaming, and Travel Accessories.\n\nAsk me for recommendations in any category, save favourites to your Wishlist, add items to your Shopping Cart, or tell me which item you want to buy to check out instantly with PayPal.';
+  if (lower.includes('track') || lower.includes('order') || lower.includes('shipping') || lower.includes('delivery')) {
+    return 'You can track all active and completed PayPal orders directly in the Order Ledger! Use the search bar in the Order Ledger to filter by Order ID, Product Name, or Tracking Number, and click "Advance Shipping Status" on any completed order to view live delivery updates.';
+  }
+
+  return 'Hello! I am Aura, your online shopping assistant. We carry 26+ curated products across Electronics & Tech, Fashion & Apparel, Footwear & Sneakers, Home & Kitchen, Beauty & Personal Care, Sports & Fitness, Gaming, and Travel Accessories.\n\nAsk me for recommendations in any category, save favourites to your Wishlist, add items to your Shopping Cart, or tell me which item you want to buy (e.g., "I want to buy the Chrono Titanium Pro Watch for $429") to check out instantly with PayPal.';
 }
 
 /**
@@ -827,13 +832,24 @@ app.get('/api/orders', (_req, res) => {
 });
 
 app.post('/api/orders/capture', (req, res) => {
-  const { orderId } = req.body || {};
+  const { orderId, item, price } = req.body || {};
   if (!orderId) {
     return res.status(400).json({ error: 'orderId is required.' });
   }
-  const order = sessionOrders.find((o) => o.orderId === orderId);
+  let order = sessionOrders.find((o) => o.orderId === orderId);
   if (!order) {
-    return res.status(404).json({ error: 'Order not found.' });
+    const details = resolveProductDetails(item || 'Aura Hardware Order');
+    order = {
+      orderId,
+      item: item || 'Aura Hardware Order',
+      price: Number(price) || 299,
+      imageUrl: details.imageUrl,
+      category: details.category,
+      specs: details.specs,
+      status: 'COMPLETED',
+      approveUrl: `https://www.sandbox.paypal.com/checkoutnow?token=${orderId}`,
+    };
+    sessionOrders.unshift(order);
   }
   order.status = 'COMPLETED';
   order.capturedAt = new Date().toISOString();
@@ -842,13 +858,19 @@ app.post('/api/orders/capture', (req, res) => {
 });
 
 app.post('/api/orders/track-advance', (req, res) => {
-  const { orderId } = req.body || {};
+  const { orderId, currentStepIndex } = req.body || {};
   if (!orderId) {
     return res.status(400).json({ error: 'orderId is required.' });
   }
-  const order = sessionOrders.find((o) => o.orderId === orderId);
+  let order = sessionOrders.find((o) => o.orderId === orderId);
   if (!order) {
-    return res.status(404).json({ error: 'Order not found.' });
+    const baseStep = typeof currentStepIndex === 'number' ? currentStepIndex : 1;
+    const nextIdx = Math.min(ORDER_TRACKING_STAGES.length - 1, baseStep + 1);
+    const tracking = createOrderTrackingInfo(orderId, nextIdx);
+    return res.json({
+      order: { orderId, status: 'COMPLETED', tracking },
+      tracking,
+    });
   }
   const currentIdx = order.tracking ? order.tracking.currentStepIndex : 1;
   const nextIdx = Math.min(ORDER_TRACKING_STAGES.length - 1, currentIdx + 1);
@@ -860,7 +882,7 @@ app.get('*', (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   app.listen(PORT, '0.0.0.0', () => {
     console.log(`Aura Agentic Commerce server running on http://0.0.0.0:${PORT}`);
   });

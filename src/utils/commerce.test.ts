@@ -336,7 +336,33 @@ test('filterOrders filters active orders by product name or order ID accurately'
   assert.equal(noMatches.length, 0);
 });
 
+test('Vercel resilient fallback handles Chrono Titanium Pro Watch purchase prompt and creates PayPal checkout order', async () => {
+  const { createFallbackCheckoutOrder } = await import('./commerce');
 
+  // Exact prompt from user screenshot on Vercel
+  const userPrompt = 'I want to buy the Chrono Titanium Pro Watch for $429';
+  const fallbackReply = generateFallbackAuraResponse(userPrompt);
+  const parsedIntent = parsePurchaseIntent(fallbackReply);
 
+  assert.ok(parsedIntent, 'Expected purchase intent JSON from fallback engine');
+  assert.equal(parsedIntent.intent, 'purchase');
+  assert.equal(parsedIntent.item, 'Chrono Titanium Pro Watch');
+  assert.equal(parsedIntent.price, 429);
 
+  // Short chip prompt "Buy Watch ($429)"
+  const shortChipReply = generateFallbackAuraResponse('Buy Watch ($429)');
+  const parsedChipIntent = parsePurchaseIntent(shortChipReply);
+  assert.ok(parsedChipIntent, 'Expected purchase intent JSON from short chip prompt');
+  assert.equal(parsedChipIntent.item, 'Chrono Titanium Pro Watch');
+  assert.equal(parsedChipIntent.price, 429);
+
+  // Client-side fallback checkout order generator
+  const checkoutOrder = createFallbackCheckoutOrder(parsedIntent.item, parsedIntent.price);
+  assert.ok(checkoutOrder.orderId.startsWith('EC-AURA-'));
+  assert.ok(checkoutOrder.approveUrl.includes('sandbox.paypal.com/checkoutnow?token='));
+  assert.equal(checkoutOrder.item, 'Chrono Titanium Pro Watch');
+  assert.equal(checkoutOrder.price, 429);
+  assert.equal(checkoutOrder.imageUrl, '/images/chrono-watch.svg');
+  assert.equal(checkoutOrder.status, 'CREATED');
+});
 

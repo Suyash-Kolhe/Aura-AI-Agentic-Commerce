@@ -43,6 +43,8 @@ import {
   parsePurchaseIntent,
   resolveProductDetails,
   filterOrders,
+  generateFallbackAuraResponse,
+  createFallbackCheckoutOrder,
 } from '../utils/commerce';
 import { formatUserInitials } from '../utils/auth';
 

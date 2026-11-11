@@ -47,6 +47,7 @@ import {
   createFallbackCheckoutOrder,
 } from '../utils/commerce';
 import { formatUserInitials } from '../utils/auth';
+import OrderTrendsChart from './OrderTrendsChart';
 
 export interface ChatMessage {
   id: string;
@@ -1228,6 +1229,9 @@ export default function ChatPage({ currentUser, onBackToHome, onLogout }: ChatPa
                   <div>price: ${lastIntent.price.toFixed(2)} USD</div>
                 </div>
               )}
+
+              {/* Recharts BarChart: Order Frequency & Spending Trends */}
+              <OrderTrendsChart orders={filteredActiveOrders} />
 
               {activeOrders.length === 0 ? (
                 <div className="py-6 text-center text-xs text-zinc-500">

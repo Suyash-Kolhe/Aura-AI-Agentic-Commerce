@@ -397,3 +397,60 @@ test('buildZapierOrderPayload constructs the exact JSON payload format expected 
   assert.ok(typeof autoTimePayload.timestamp === 'string' && autoTimePayload.timestamp.length > 0);
 });
 
+test('calculateOrderTrends aggregates order frequency and spending trends for Recharts bar chart', async () => {
+  const { calculateOrderTrends } = await import('./commerce');
+
+  const sampleOrders = [
+    {
+      orderId: 'ORD-98741-AURA',
+      item: 'Aether ANC-1 Studio Headphones',
+      price: 349,
+      category: 'Spatial Audio',
+      status: 'COMPLETED',
+    },
+    {
+      orderId: 'ORD-84512-PRO',
+      item: 'Chrono Titanium Pro Watch',
+      price: 429,
+      category: 'Wearables',
+      status: 'CREATED',
+    },
+    {
+      orderId: 'ORD-55110-ANC2',
+      item: 'Aether ANC-1 Studio Headphones',
+      price: 349,
+      category: 'Spatial Audio',
+      status: 'COMPLETED',
+    },
+  ];
+
+  const summary = calculateOrderTrends(sampleOrders);
+
+  assert.equal(summary.totalOrders, 3);
+  assert.equal(summary.capturedOrders, 2);
+  assert.equal(summary.pendingOrders, 1);
+  assert.equal(summary.totalSpend, 1127);
+  assert.equal(summary.capturedSpend, 698);
+  assert.equal(summary.averageOrderValue, 375.67);
+
+  // Category grouping check
+  assert.equal(summary.categoryTrends.length, 2);
+  const audioCat = summary.categoryTrends.find((c) => c.name === 'Spatial Audio');
+  assert.ok(audioCat);
+  assert.equal(audioCat.shortName, 'Audio');
+  assert.equal(audioCat.orders, 2);
+  assert.equal(audioCat.capturedOrders, 2);
+  assert.equal(audioCat.spending, 698);
+
+  const wearableCat = summary.categoryTrends.find((c) => c.name === 'Wearables');
+  assert.ok(wearableCat);
+  assert.equal(wearableCat.orders, 1);
+  assert.equal(wearableCat.pendingOrders, 1);
+  assert.equal(wearableCat.spending, 429);
+
+  // Chronological timeline points check
+  assert.equal(summary.timelineTrends.length, 3);
+  assert.equal(summary.timelineTrends[0].spending, 349);
+  assert.equal(summary.timelineTrends[1].spending, 429);
+});
+

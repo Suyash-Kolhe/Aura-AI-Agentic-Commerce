@@ -864,6 +864,70 @@
                 </div>
               </div>
 
+              <!-- Recharts Order Frequency & Spending Trends Bar Chart Card -->
+              <div
+                id="order-trends-chart-card"
+                aria-label="Order Frequency and Spending Trends Chart"
+                class="mb-4 p-3.5 rounded-xl bg-black/35 border border-white/10 space-y-3"
+              >
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-purple-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 16h8"/><path d="M7 11h12"/><path d="M7 6h3"/></svg>
+                    <div>
+                      <h4 class="text-xs font-bold text-white leading-tight">Order Frequency &amp; Spending Trends</h4>
+                      <p class="text-[11px] text-zinc-400">Live volume ($ USD) &amp; order count across active ledger</p>
+                    </div>
+                  </div>
+                  <div
+                    role="group"
+                    aria-label="Chart grouping mode"
+                    class="inline-flex items-center p-0.5 rounded-lg bg-white/5 border border-white/10"
+                  >
+                    <button
+                      type="button"
+                      id="chart-group-category-btn"
+                      data-chart-group="category"
+                      class="px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer bg-purple-600 text-white shadow-sm"
+                    >
+                      By Category
+                    </button>
+                    <button
+                      type="button"
+                      id="chart-group-timeline-btn"
+                      data-chart-group="timeline"
+                      class="px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer text-zinc-400 hover:text-white"
+                    >
+                      By Order
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Summary Metric Strip -->
+                <div class="flex flex-wrap items-center justify-between gap-2 py-2 px-3 rounded-lg bg-white/[0.03] border border-white/5 text-[11px]">
+                  <div class="flex items-center gap-1.5 text-zinc-400">
+                    <span>Total Spend:</span>
+                    <strong id="chart-kpi-total-spend" class="font-mono text-emerald-400 tabular-nums">$0.00</strong>
+                  </div>
+                  <span aria-hidden="true" class="text-zinc-600">·</span>
+                  <div class="flex items-center gap-1.5 text-zinc-400">
+                    <span>Frequency:</span>
+                    <strong id="chart-kpi-total-orders" class="font-mono text-purple-300 tabular-nums">0 Orders</strong>
+                  </div>
+                  <span aria-hidden="true" class="text-zinc-600">·</span>
+                  <div class="flex items-center gap-1.5 text-zinc-400">
+                    <span>Avg Order:</span>
+                    <strong id="chart-kpi-avg-order" class="font-mono text-zinc-200 tabular-nums">$0</strong>
+                  </div>
+                </div>
+
+                <!-- Bar Chart SVG Viewport -->
+                <div
+                  id="recharts-order-trends-container"
+                  data-testid="recharts-order-trends-container"
+                  class="w-full pt-1"
+                ></div>
+              </div>
+
               <!-- Orders List -->
               <div id="orders-container" class="space-y-3">
                 <div id="empty-orders-state" class="py-4 text-center text-xs text-zinc-500">
@@ -3183,7 +3247,6 @@
         try {
           let checkoutData = null;
           try {
-            // Relative path ensures seamless requests on Render's domain without hardcoded localhost URLs
             const checkoutRes = await fetch('/api/checkout', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -3600,6 +3663,8 @@
           }
         }
 
+        renderOrderTrendsBarChart(filteredOrders);
+
         if (totalOrders === 0) {
           ordersContainer.innerHTML = `
             <div class="py-4 text-center text-xs text-zinc-500">
@@ -3882,7 +3947,6 @@
         try {
           let rawReply = '';
           try {
-            // Relative path (/api/chat) works across Render production domains and local dev
             const chatRes = await fetch('/api/chat', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -3937,7 +4001,6 @@
 
                 let checkoutData = null;
                 try {
-                  // Relative path (/api/checkout) works across Render production domains and local dev
                   const checkoutRes = await fetch('/api/checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -4197,6 +4260,182 @@
           renderOrdersLedger();
         });
       }
+
+      let orderChartGroupMode = 'category';
+
+      function shortenChartCategory(cat) {
+        const clean = (cat || 'Hardware').trim();
+        const map = {
+          'Spatial Audio': 'Audio',
+          Wearables: 'Wearables',
+          'Spatial Computing': 'Spatial AR',
+          'Input Hardware': 'Keyboards',
+          'Electronics & Tech': 'Tech',
+          'Fashion & Apparel': 'Fashion',
+          'Footwear & Sneakers': 'Footwear',
+          'Home & Kitchen': 'Home',
+          'Beauty & Personal Care': 'Beauty',
+          'Sports & Fitness': 'Fitness',
+          Gaming: 'Gaming',
+          'Gaming & Consoles': 'Gaming',
+          'Travel Accessories': 'Travel',
+          'Bags & Travel': 'Travel',
+          'Multi-Item Cart Bundle': 'Bundle',
+        };
+        if (map[clean]) return map[clean];
+        return clean.length > 10 ? clean.slice(0, 9) + '…' : clean;
+      }
+
+      function renderOrderTrendsBarChart(ordersList) {
+        const safeOrders = Array.isArray(ordersList) ? ordersList : [];
+        const totalSpendEl = document.getElementById('chart-kpi-total-spend');
+        const totalOrdersEl = document.getElementById('chart-kpi-total-orders');
+        const avgOrderEl = document.getElementById('chart-kpi-avg-order');
+        const chartContainer = document.getElementById('recharts-order-trends-container');
+        const catBtn = document.getElementById('chart-group-category-btn');
+        const timeBtn = document.getElementById('chart-group-timeline-btn');
+
+        if (catBtn && timeBtn) {
+          if (orderChartGroupMode === 'category') {
+            catBtn.className = 'px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer bg-purple-600 text-white shadow-sm';
+            timeBtn.className = 'px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer text-zinc-400 hover:text-white';
+          } else {
+            timeBtn.className = 'px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer bg-purple-600 text-white shadow-sm';
+            catBtn.className = 'px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer text-zinc-400 hover:text-white';
+          }
+        }
+
+        let totalSpend = 0;
+        const categoryMap = new Map();
+
+        safeOrders.forEach((ord) => {
+          const price = Number(ord.price) > 0 ? Math.round(Number(ord.price) * 100) / 100 : 0;
+          const resolved = resolveClientProduct(ord.item || '');
+          const cat = ord.category || resolved.category || 'Hardware';
+          totalSpend += price;
+
+          const existing = categoryMap.get(cat) || { orders: 0, spending: 0 };
+          existing.orders += 1;
+          existing.spending = Math.round((existing.spending + price) * 100) / 100;
+          categoryMap.set(cat, existing);
+        });
+
+        totalSpend = Math.round(totalSpend * 100) / 100;
+        const totalOrdersCount = safeOrders.length;
+        const avgSpend = totalOrdersCount > 0 ? Math.round(totalSpend / totalOrdersCount) : 0;
+
+        if (totalSpendEl) totalSpendEl.textContent = `$${totalSpend.toFixed(2)}`;
+        if (totalOrdersEl) {
+          totalOrdersEl.textContent = `${totalOrdersCount} ${totalOrdersCount === 1 ? 'Order' : 'Orders'}`;
+        }
+        if (avgOrderEl) avgOrderEl.textContent = `$${avgSpend}`;
+
+        if (!chartContainer) return;
+
+        const points =
+          orderChartGroupMode === 'category'
+            ? Array.from(categoryMap.entries()).map(([catName, stats]) => ({
+                name: catName,
+                shortName: shortenChartCategory(catName),
+                orders: stats.orders,
+                spending: stats.spending,
+              }))
+            : [...safeOrders].reverse().map((ord, idx) => {
+                const shortId = String(ord.orderId || `ORD-${idx + 1}`)
+                  .replace(/^ORD-|^EC-AURA-/i, '')
+                  .slice(0, 6);
+                return {
+                  name: `${ord.item} (${ord.orderId})`,
+                  shortName: `#${idx + 1} ${shortId}`,
+                  orders: 1,
+                  spending: Number(ord.price) || 0,
+                };
+              });
+
+        if (points.length === 0) {
+          chartContainer.innerHTML = `
+            <div class="h-36 flex items-center justify-center text-xs text-zinc-500 font-mono">
+              No matching order data to chart
+            </div>
+          `;
+          return;
+        }
+
+        const maxSpend = Math.max(...points.map((p) => p.spending), 100);
+        const maxFreq = Math.max(...points.map((p) => p.orders), 2);
+        const svgWidth = 420;
+        const svgHeight = 165;
+        const chartTop = 14;
+        const chartBottom = 132;
+        const chartLeft = 42;
+        const chartRight = 392;
+        const plotWidth = chartRight - chartLeft;
+        const plotHeight = chartBottom - chartTop;
+        const slotWidth = plotWidth / points.length;
+
+        const gridLines = [0, 0.5, 1]
+          .map((ratio) => {
+            const y = Math.round(chartBottom - ratio * plotHeight);
+            const spendTick = Math.round(ratio * maxSpend);
+            const freqTick = Math.round(ratio * maxFreq);
+            return `
+              <line x1="${chartLeft}" y1="${y}" x2="${chartRight}" y2="${y}" stroke="rgba(255,255,255,0.08)" stroke-dasharray="3 3" />
+              <text x="${chartLeft - 6}" y="${y + 3}" text-anchor="end" fill="#34d399" font-size="9.5" font-family="monospace">$${spendTick}</text>
+              <text x="${chartRight + 6}" y="${y + 3}" text-anchor="start" fill="#c084fc" font-size="9.5" font-family="monospace">${freqTick}</text>
+            `;
+          })
+          .join('');
+
+        const barsSvg = points
+          .map((pt, idx) => {
+            const centerX = chartLeft + slotWidth * idx + slotWidth / 2;
+            const barW = Math.min(20, Math.max(10, Math.floor(slotWidth * 0.28)));
+            const spendH = Math.max(4, Math.round((pt.spending / maxSpend) * plotHeight));
+            const freqH = Math.max(4, Math.round((pt.orders / maxFreq) * plotHeight));
+            const spendY = chartBottom - spendH;
+            const freqY = chartBottom - freqH;
+
+            return `
+              <g class="recharts-layer recharts-bar-Group">
+                <title>${escapeHtml(pt.name)} — Spend: $${pt.spending.toFixed(2)} USD | Frequency: ${pt.orders} order(s)</title>
+                <rect x="${centerX - barW - 2}" y="${spendY}" width="${barW}" height="${spendH}" rx="4" fill="#10b981" />
+                <rect x="${centerX + 2}" y="${freqY}" width="${barW}" height="${freqH}" rx="4" fill="#8b5cf6" />
+                <text x="${centerX}" y="${chartBottom + 15}" text-anchor="middle" fill="#a1a1aa" font-size="9.5">${escapeHtml(pt.shortName)}</text>
+              </g>
+            `;
+          })
+          .join('');
+
+        chartContainer.innerHTML = `
+          <div class="recharts-responsive-container w-full">
+            <svg viewBox="0 0 ${svgWidth} ${svgHeight}" class="recharts-surface w-full h-44 overflow-visible" role="img" aria-label="Bar chart of order spending and frequency">
+              ${gridLines}
+              <line x1="${chartLeft}" y1="${chartBottom}" x2="${chartRight}" y2="${chartBottom}" stroke="rgba(255,255,255,0.15)" />
+              ${barsSvg}
+            </svg>
+            <div class="flex items-center justify-center gap-5 pt-1 text-[11px] text-zinc-300">
+              <span class="inline-flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+                <span>Spending ($ USD)</span>
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block"></span>
+                <span>Order Frequency</span>
+              </span>
+            </div>
+          </div>
+        `;
+      }
+
+      document.querySelectorAll('[data-chart-group]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const mode = btn.getAttribute('data-chart-group');
+          if (mode) {
+            orderChartGroupMode = mode;
+            renderOrdersLedger();
+          }
+        });
+      });
 
       window.addEventListener('hashchange', handleInitialRoute);
       handleInitialRoute();

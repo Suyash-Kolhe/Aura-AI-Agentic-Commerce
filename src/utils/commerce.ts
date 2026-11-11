@@ -1053,6 +1053,145 @@ export function filterOrders<T extends FilterableOrder>(
   });
 }
 
+export interface TrendOrderInput {
+  orderId: string;
+  item: string;
+  price: number;
+  category?: string;
+  status?: string;
+  createdAt?: string;
+}
 
+export interface OrderTrendPoint {
+  name: string;
+  shortName: string;
+  orders: number;
+  capturedOrders: number;
+  pendingOrders: number;
+  spending: number;
+  avgOrderValue: number;
+}
 
+export interface OrderAnalyticsSummary {
+  totalOrders: number;
+  capturedOrders: number;
+  pendingOrders: number;
+  totalSpend: number;
+  capturedSpend: number;
+  averageOrderValue: number;
+  categoryTrends: OrderTrendPoint[];
+  timelineTrends: OrderTrendPoint[];
+}
 
+function shortenCategoryLabel(category: string): string {
+  const clean = (category || 'Hardware').trim();
+  const map: Record<string, string> = {
+    'Spatial Audio': 'Audio',
+    Wearables: 'Wearables',
+    'Spatial Computing': 'Spatial AR',
+    'Input Hardware': 'Keyboards',
+    'Electronics & Tech': 'Tech',
+    'Fashion & Apparel': 'Fashion',
+    'Footwear & Sneakers': 'Footwear',
+    'Home & Kitchen': 'Home',
+    'Beauty & Personal Care': 'Beauty',
+    'Sports & Fitness': 'Fitness',
+    Gaming: 'Gaming',
+    'Gaming & Consoles': 'Gaming',
+    'Travel Accessories': 'Travel',
+    'Bags & Travel': 'Travel',
+    'Multi-Item Cart Bundle': 'Bundle',
+  };
+  if (map[clean]) return map[clean];
+  return clean.length > 10 ? `${clean.slice(0, 9)}…` : clean;
+}
+
+/**
+ * Pure function to compute order frequency and spending trend datasets for Recharts bar chart visualization.
+ */
+export function calculateOrderTrends(orders: TrendOrderInput[]): OrderAnalyticsSummary {
+  const safeOrders = Array.isArray(orders) ? orders : [];
+
+  let totalSpend = 0;
+  let capturedSpend = 0;
+  let capturedOrders = 0;
+
+  const categoryMap = new Map<
+    string,
+    { orders: number; capturedOrders: number; spending: number }
+  >();
+
+  for (const ord of safeOrders) {
+    const price = Number(ord.price) > 0 ? Math.round(Number(ord.price) * 100) / 100 : 0;
+    const isCompleted = (ord.status || '').toUpperCase() === 'COMPLETED';
+    const resolvedCategory =
+      ord.category?.trim() || resolveProductDetails(ord.item || '').category || 'Tech Hardware';
+
+    totalSpend += price;
+    if (isCompleted) {
+      capturedOrders += 1;
+      capturedSpend += price;
+    }
+
+    const existing = categoryMap.get(resolvedCategory) || {
+      orders: 0,
+      capturedOrders: 0,
+      spending: 0,
+    };
+    existing.orders += 1;
+    if (isCompleted) {
+      existing.capturedOrders += 1;
+    }
+    existing.spending = Math.round((existing.spending + price) * 100) / 100;
+    categoryMap.set(resolvedCategory, existing);
+  }
+
+  totalSpend = Math.round(totalSpend * 100) / 100;
+  capturedSpend = Math.round(capturedSpend * 100) / 100;
+  const totalOrders = safeOrders.length;
+  const pendingOrders = Math.max(0, totalOrders - capturedOrders);
+  const averageOrderValue =
+    totalOrders > 0 ? Math.round((totalSpend / totalOrders) * 100) / 100 : 0;
+
+  const categoryTrends: OrderTrendPoint[] = Array.from(categoryMap.entries()).map(
+    ([catName, stats]) => ({
+      name: catName,
+      shortName: shortenCategoryLabel(catName),
+      orders: stats.orders,
+      capturedOrders: stats.capturedOrders,
+      pendingOrders: Math.max(0, stats.orders - stats.capturedOrders),
+      spending: stats.spending,
+      avgOrderValue:
+        stats.orders > 0 ? Math.round((stats.spending / stats.orders) * 100) / 100 : 0,
+    })
+  );
+
+  // Build chronological / order-batch timeline trend buckets from oldest to newest
+  const chronological = [...safeOrders].reverse();
+  const timelineTrends: OrderTrendPoint[] = chronological.map((ord, idx) => {
+    const price = Number(ord.price) > 0 ? Math.round(Number(ord.price) * 100) / 100 : 0;
+    const isCompleted = (ord.status || '').toUpperCase() === 'COMPLETED';
+    const shortId = (ord.orderId || `ORD-${idx + 1}`).replace(/^ORD-|^EC-AURA-/i, '').slice(0, 6);
+    const itemShort = (ord.item || 'Order').split(' ').slice(0, 2).join(' ');
+    return {
+      name: `${ord.item} (${ord.orderId})`,
+      shortName: `#${idx + 1} ${shortId || itemShort}`,
+      orders: 1,
+      capturedOrders: isCompleted ? 1 : 0,
+      pendingOrders: isCompleted ? 0 : 1,
+      spending: price,
+      avgOrderValue: price,
+    };
+  });
+
+  return {
+    totalOrders,
+    capturedOrders,
+    pendingOrders,
+    totalSpend,
+    capturedSpend,
+    averageOrderValue,
+    categoryTrends,
+    timelineTrends,
+  };
+}

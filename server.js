@@ -607,11 +607,7 @@ app.post('/api/checkout', async (req, res) => {
   const price = Math.round(numericPrice * 100) / 100;
   const formattedPrice = price.toFixed(2);
   const productDetails = resolveProductDetails(item);
-  const appUrl = (
-    process.env.APP_URL ||
-    process.env.RENDER_EXTERNAL_URL ||
-    `http://localhost:${PORT}`
-  ).replace(/\/$/, '');
+  const appUrl = (process.env.APP_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
 
   const orderPayload = {
     intent: 'CAPTURE',

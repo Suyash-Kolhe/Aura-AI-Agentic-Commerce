@@ -3183,6 +3183,7 @@
         try {
           let checkoutData = null;
           try {
+            // Relative path ensures seamless requests on Render's domain without hardcoded localhost URLs
             const checkoutRes = await fetch('/api/checkout', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -3881,6 +3882,7 @@
         try {
           let rawReply = '';
           try {
+            // Relative path (/api/chat) works across Render production domains and local dev
             const chatRes = await fetch('/api/chat', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -3935,6 +3937,7 @@
 
                 let checkoutData = null;
                 try {
+                  // Relative path (/api/checkout) works across Render production domains and local dev
                   const checkoutRes = await fetch('/api/checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

@@ -573,6 +573,32 @@ export function extractApprovalUrl(orderResponse: unknown): string | null {
   return approveLink?.href ?? null;
 }
 
+export interface ZapierOrderPayload {
+  order_id: string;
+  item: string;
+  price: number;
+  status: string;
+  timestamp: string;
+}
+
+/**
+ * Builds the webhook logging payload for Zapier automation integrations.
+ */
+export function buildZapierOrderPayload(
+  orderId: string,
+  item: string,
+  price: number,
+  timestamp: string = new Date().toISOString()
+): ZapierOrderPayload {
+  return {
+    order_id: orderId,
+    item,
+    price,
+    status: 'PayPal Link Generated',
+    timestamp,
+  };
+}
+
 export interface CheckoutOrderResult {
   orderId: string;
   item: string;

@@ -366,3 +366,34 @@ test('Vercel resilient fallback handles Chrono Titanium Pro Watch purchase promp
   assert.equal(checkoutOrder.status, 'CREATED');
 });
 
+test('buildZapierOrderPayload constructs the exact JSON payload format expected by Zapier webhook', async () => {
+  const { buildZapierOrderPayload } = await import('./commerce');
+  const fixedTimestamp = '2026-11-11T13:17:19.000Z';
+  const payload = buildZapierOrderPayload(
+    '5O190127TN364715T',
+    'Chrono Titanium Pro Watch',
+    429,
+    fixedTimestamp
+  );
+
+  assert.deepEqual(payload, {
+    order_id: '5O190127TN364715T',
+    item: 'Chrono Titanium Pro Watch',
+    price: 429,
+    status: 'PayPal Link Generated',
+    timestamp: fixedTimestamp,
+  });
+
+  // Default timestamp format check
+  const autoTimePayload = buildZapierOrderPayload(
+    'EC-AURA-12345',
+    'Aether ANC-1 Studio Headphones',
+    349
+  );
+  assert.equal(autoTimePayload.order_id, 'EC-AURA-12345');
+  assert.equal(autoTimePayload.item, 'Aether ANC-1 Studio Headphones');
+  assert.equal(autoTimePayload.price, 349);
+  assert.equal(autoTimePayload.status, 'PayPal Link Generated');
+  assert.ok(typeof autoTimePayload.timestamp === 'string' && autoTimePayload.timestamp.length > 0);
+});
+

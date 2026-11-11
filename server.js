@@ -13,6 +13,8 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
+// Required environment variable for logging orders and transactions to Zapier
+const ZAPIER_WEBHOOK_URL = process.env.ZAPIER_WEBHOOK_URL;
 
 app.use(cors());
 app.use(express.json());
@@ -360,6 +362,8 @@ function isConfiguredSecret(val) {
     'YOUR_PAYPAL_SANDBOX_CLIENT_SECRET',
     'PAYPAL_CLIENT_ID',
     'PAYPAL_CLIENT_SECRET',
+    'YOUR_ZAPIER_WEBHOOK_URL',
+    'ZAPIER_WEBHOOK_URL',
   ];
   return !placeholders.includes(trimmed);
 }
@@ -603,7 +607,11 @@ app.post('/api/checkout', async (req, res) => {
   const price = Math.round(numericPrice * 100) / 100;
   const formattedPrice = price.toFixed(2);
   const productDetails = resolveProductDetails(item);
-  const appUrl = (process.env.APP_URL || `http://localhost:${PORT}`).replace(/\/$/, '');
+  const appUrl = (
+    process.env.APP_URL ||
+    process.env.RENDER_EXTERNAL_URL ||
+    `http://localhost:${PORT}`
+  ).replace(/\/$/, '');
 
   const orderPayload = {
     intent: 'CAPTURE',
@@ -664,6 +672,30 @@ app.post('/api/checkout', async (req, res) => {
     };
     sessionOrders.unshift(orderRecord);
 
+    // Asynchronously dispatch order details to Zapier webhook
+    if (process.env.ZAPIER_WEBHOOK_URL) {
+      try {
+        await axios.post(
+          process.env.ZAPIER_WEBHOOK_URL,
+          {
+            order_id: orderResponse.data.id,
+            item,
+            price,
+            status: 'PayPal Link Generated',
+            timestamp: new Date().toISOString(),
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            timeout: 8000,
+          }
+        );
+      } catch (zapierError) {
+        console.error('Zapier webhook logging failed:', zapierError?.message || zapierError);
+      }
+    }
+
     return res.json({
       approveUrl: approveLink.href,
       url: approveLink.href,
@@ -695,6 +727,30 @@ app.post('/api/checkout', async (req, res) => {
       createdAt: new Date().toISOString(),
     };
     sessionOrders.unshift(orderRecord);
+
+    // Asynchronously dispatch order details to Zapier webhook in preview fallback mode as well
+    if (process.env.ZAPIER_WEBHOOK_URL) {
+      try {
+        await axios.post(
+          process.env.ZAPIER_WEBHOOK_URL,
+          {
+            order_id: mockToken,
+            item,
+            price,
+            status: 'PayPal Link Generated',
+            timestamp: new Date().toISOString(),
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            timeout: 8000,
+          }
+        );
+      } catch (zapierError) {
+        console.error('Zapier webhook logging failed (fallback):', zapierError?.message || zapierError);
+      }
+    }
 
     return res.json({
       approveUrl,

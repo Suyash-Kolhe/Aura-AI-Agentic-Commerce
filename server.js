@@ -625,9 +625,11 @@ app.post('/api/checkout', async (req, res) => {
     ],
     application_context: {
       brand_name: 'Aura Tech Commerce',
+      landing_page: 'BILLING',
+      shipping_preference: 'NO_SHIPPING',
       user_action: 'PAY_NOW',
-      return_url: `${appUrl}/?checkout=approved`,
-      cancel_url: `${appUrl}/?checkout=cancelled`,
+      return_url: `${appUrl}/#chat`,
+      cancel_url: `${appUrl}/#chat`,
     },
   };
 
@@ -709,7 +711,18 @@ app.post('/api/checkout', async (req, res) => {
     });
   } catch (_paypalErr) {
     const mockToken = `EC-AURA-${Date.now().toString(36).toUpperCase()}`;
-    const approveUrl = `https://www.sandbox.paypal.com/checkoutnow?token=${mockToken}`;
+    const sandboxParams = new URLSearchParams({
+      cmd: '_xclick',
+      business: 'sb-merchant@business.example.com',
+      item_name: item,
+      amount: formattedPrice,
+      currency_code: 'USD',
+      invoice: mockToken,
+      no_shipping: '1',
+      return: `${appUrl}/#chat`,
+      cancel_return: `${appUrl}/#chat`,
+    });
+    const approveUrl = `https://www.sandbox.paypal.com/cgi-bin/webscr?${sandboxParams.toString()}`;
 
     const orderRecord = {
       orderId: mockToken,
@@ -856,7 +869,8 @@ sessionOrders.push(
     category: 'Spatial Audio',
     specs: '45mm Beryllium Drivers · 48dB Hybrid ANC · 60h Battery',
     status: 'COMPLETED',
-    approveUrl: 'https://www.sandbox.paypal.com/checkoutnow?token=ORD-98741-AURA',
+    approveUrl:
+      'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_xclick&business=sb-merchant%40business.example.com&item_name=Aether+ANC-1+Studio+Headphones&amount=349.00&currency_code=USD&invoice=ORD-98741-AURA&no_shipping=1',
     tracking: createOrderTrackingInfo('ORD-98741-AURA', 2),
   },
   {
@@ -867,7 +881,8 @@ sessionOrders.push(
     category: 'Wearables',
     specs: 'Aerospace Grade 5 Titanium · Dual-band GPS · 14-Day Battery',
     status: 'CREATED',
-    approveUrl: 'https://www.sandbox.paypal.com/checkoutnow?token=ORD-84512-PRO',
+    approveUrl:
+      'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_xclick&business=sb-merchant%40business.example.com&item_name=Chrono+Titanium+Pro+Watch&amount=429.00&currency_code=USD&invoice=ORD-84512-PRO&no_shipping=1',
   },
   {
     orderId: 'ORD-62190-STUDIO',
@@ -877,7 +892,8 @@ sessionOrders.push(
     category: 'Footwear & Sneakers',
     specs: 'Dual-Density Pebax Foam · Full-Length Carbon Plate',
     status: 'COMPLETED',
-    approveUrl: 'https://www.sandbox.paypal.com/checkoutnow?token=ORD-62190-STUDIO',
+    approveUrl:
+      'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_xclick&business=sb-merchant%40business.example.com&item_name=AeroStride+Carbon+Marathon+Sneakers&amount=219.00&currency_code=USD&invoice=ORD-62190-STUDIO&no_shipping=1',
     tracking: createOrderTrackingInfo('ORD-62190-STUDIO', 4),
   }
 );
@@ -931,6 +947,114 @@ app.post('/api/orders/track-advance', (req, res) => {
   const nextIdx = Math.min(ORDER_TRACKING_STAGES.length - 1, currentIdx + 1);
   order.tracking = createOrderTrackingInfo(order.orderId, nextIdx);
   return res.json({ order, tracking: order.tracking });
+});
+
+app.get('/paypal-checkout', (req, res) => {
+  const token = String(req.query.token || 'EC-AURA-ORDER');
+  const existing = sessionOrders.find((o) => o.orderId === token);
+  const item = String(req.query.item || existing?.item || 'Aura Hardware Order');
+  const price = Number(req.query.price || existing?.price || 349).toFixed(2);
+  const details = resolveProductDetails(item);
+  const escapeHtml = (str) =>
+    String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+
+  res.send(`<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PayPal Checkout — Aura Tech Commerce</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-[#f5f7fa] text-slate-900 flex items-center justify-center p-4 font-sans">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+    <div class="bg-[#003087] text-white px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-xl font-extrabold italic tracking-tight">Pay<span class="text-[#0079C1]">Pal</span></span>
+        <span class="text-[11px] bg-white/15 px-2 py-0.5 rounded font-mono">Orders v2 Checkout</span>
+      </div>
+      <span class="text-sm font-mono font-bold">$${escapeHtml(price)} USD</span>
+    </div>
+    <div id="checkout-body" class="p-6 space-y-5">
+      <div class="flex items-center gap-3.5 p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+        <img src="${escapeHtml(details.imageUrl)}" alt="${escapeHtml(item)}" class="w-16 h-14 object-cover rounded-lg border border-slate-200 bg-white shrink-0" />
+        <div class="min-w-0 flex-1">
+          <div class="text-xs text-slate-500 font-mono">${escapeHtml(token)}</div>
+          <div class="text-sm font-bold text-slate-900 truncate">${escapeHtml(item)}</div>
+          <div class="text-xs text-slate-500 truncate">${escapeHtml(details.specs)}</div>
+        </div>
+      </div>
+
+      <div class="space-y-2.5">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Payment Method</div>
+        <label class="flex items-center justify-between p-3.5 rounded-xl border-2 border-[#0070BA] bg-blue-50/40 cursor-pointer">
+          <div class="flex items-center gap-3">
+            <input type="radio" name="paymethod" checked class="accent-[#0070BA]" />
+            <div>
+              <div class="text-sm font-bold text-slate-900">PayPal Balance</div>
+              <div class="text-xs text-slate-500">sb-buyer@personal.example.com · Verified</div>
+            </div>
+          </div>
+          <span class="text-xs font-mono font-semibold text-[#0070BA]">Instant</span>
+        </label>
+        <label class="flex items-center justify-between p-3.5 rounded-xl border border-slate-200 hover:border-slate-300 cursor-pointer">
+          <div class="flex items-center gap-3">
+            <input type="radio" name="paymethod" class="accent-[#0070BA]" />
+            <div>
+              <div class="text-sm font-semibold text-slate-800">Visa Signature •••• 4242</div>
+              <div class="text-xs text-slate-500"> No additional conversion fees</div>
+            </div>
+          </div>
+          <span class="text-xs font-mono text-slate-500">USD</span>
+        </label>
+      </div>
+
+      <div class="pt-2 border-t border-slate-200 space-y-2 text-xs text-slate-600">
+        <div class="flex justify-between"><span>Merchant</span><strong class="text-slate-800">Aura Tech Commerce</strong></div>
+        <div class="flex justify-between"><span>Insured Express Shipping</span><strong class="text-emerald-600">FREE</strong></div>
+        <div class="flex justify-between text-sm font-bold text-slate-900 pt-1"><span>Total Amount</span><span>$${escapeHtml(price)} USD</span></div>
+      </div>
+
+      <button id="pay-now-btn" type="button" class="w-full py-3.5 rounded-full bg-[#0070BA] hover:bg-[#005ea6] text-white font-bold text-sm shadow-lg transition cursor-pointer">
+        Complete Purchase ($${escapeHtml(price)} USD)
+      </button>
+      <a href="/#chat" class="block text-center text-xs text-slate-500 hover:text-slate-800 underline">Cancel and return to Aura Tech Commerce</a>
+    </div>
+  </div>
+  <script>
+    document.getElementById('pay-now-btn').addEventListener('click', async function() {
+      const btn = this;
+      btn.disabled = true;
+      btn.textContent = 'Authorizing & Capturing Payment...';
+      try {
+        await fetch('/api/orders/capture', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            orderId: ${JSON.stringify(token)},
+            item: ${JSON.stringify(item)},
+            price: ${Number(price)}
+          })
+        });
+      } catch (e) {}
+      document.getElementById('checkout-body').innerHTML = \`
+        <div class="py-6 text-center space-y-4">
+          <div class="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto text-2xl font-bold">✓</div>
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">Payment Completed ($${escapeHtml(price)} USD)</h2>
+            <p class="text-xs text-slate-500 mt-1">Order <strong>${escapeHtml(token)}</strong> has been captured and 5-Stage Order Tracking is now active.</p>
+          </div>
+          <a href="/#chat" class="inline-block w-full py-3 rounded-full bg-[#003087] hover:bg-[#002060] text-white font-bold text-sm shadow">Return to Aura Order Tracking Ledger →</a>
+        </div>
+      \`;
+    });
+  </script>
+</body>
+</html>`);
 });
 
 app.get('*', (_req, res) => {

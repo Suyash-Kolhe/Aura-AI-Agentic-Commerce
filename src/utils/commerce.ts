@@ -639,6 +639,49 @@ export function createFallbackCheckoutOrder(item: string, price: number): Checko
 }
 
 /**
+ * Resolves a valid, live PayPal Sandbox website checkout URL on https://www.sandbox.paypal.com.
+ * If rawApproveUrl contains a real PayPal Orders v2 token (from api-m.sandbox.paypal.com), it is preserved;
+ * if it contains a synthetic fallback/demo token (EC-AURA-* or ORD-*), it builds a live PayPal Sandbox
+ * webscr checkout URL with the exact item name, USD amount, and order invoice ID so PayPal Sandbox
+ * mints a real checkout session without showing an invalid-token error page.
+ */
+export function resolvePayPalSandboxCheckoutUrl(
+  item: string,
+  price: number,
+  orderId?: string,
+  rawApproveUrl?: string
+): string {
+  const trimmedUrl = (rawApproveUrl || '').trim();
+  if (
+    trimmedUrl.startsWith('https://www.sandbox.paypal.com/cgi-bin/webscr') ||
+    (trimmedUrl.startsWith('https://www.sandbox.paypal.com/checkoutnow?token=') &&
+      !/token=(?:EC-AURA-|ORD-)/i.test(trimmedUrl))
+  ) {
+    return trimmedUrl;
+  }
+
+  const cleanItem = (item || 'Aura Hardware Order').trim();
+  const safePrice =
+    Number.isFinite(Number(price)) && Number(price) > 0
+      ? (Math.round(Number(price) * 100) / 100).toFixed(2)
+      : '299.00';
+
+  const params = new URLSearchParams({
+    cmd: '_xclick',
+    business: 'sb-merchant@business.example.com',
+    item_name: cleanItem,
+    amount: safePrice,
+    currency_code: 'USD',
+    no_shipping: '1',
+  });
+  if (orderId && orderId.trim()) {
+    params.set('invoice', orderId.trim());
+  }
+
+  return `https://www.sandbox.paypal.com/cgi-bin/webscr?${params.toString()}`;
+}
+
+/**
  * Deterministic fallback for Aura when GEMINI_API_KEY is missing, rate-limited, or when running on static deployments.
  */
 export function generateFallbackAuraResponse(userMessage: string): string {

@@ -454,3 +454,30 @@ test('calculateOrderTrends aggregates order frequency and spending trends for Re
   assert.equal(summary.timelineTrends[1].spending, 429);
 });
 
+test('resolvePayPalSandboxCheckoutUrl preserves live Orders v2 tokens and upgrades synthetic tokens to working www.sandbox.paypal.com checkout URLs', async () => {
+  const { resolvePayPalSandboxCheckoutUrl } = await import('./commerce');
+
+  // 1. Real PayPal Orders v2 token from api-m.sandbox.paypal.com is preserved as-is
+  const liveTokenUrl = 'https://www.sandbox.paypal.com/checkoutnow?token=5O190127TN364715T';
+  assert.equal(
+    resolvePayPalSandboxCheckoutUrl('Chrono Titanium Pro Watch', 429, '5O190127TN364715T', liveTokenUrl),
+    liveTokenUrl
+  );
+
+  // 2. Synthetic fallback token (EC-AURA-*) is upgraded to live PayPal Sandbox webscr checkout URL
+  const syntheticUrl = 'https://www.sandbox.paypal.com/checkoutnow?token=EC-AURA-TEST123';
+  const resolvedFallback = resolvePayPalSandboxCheckoutUrl(
+    'Chrono Titanium Pro Watch',
+    429,
+    'EC-AURA-TEST123',
+    syntheticUrl
+  );
+  assert.ok(resolvedFallback.startsWith('https://www.sandbox.paypal.com/cgi-bin/webscr?'));
+  assert.ok(resolvedFallback.includes('cmd=_xclick'));
+  assert.ok(resolvedFallback.includes('item_name=Chrono+Titanium+Pro+Watch'));
+  assert.ok(resolvedFallback.includes('amount=429.00'));
+  assert.ok(resolvedFallback.includes('currency_code=USD'));
+  assert.ok(resolvedFallback.includes('invoice=EC-AURA-TEST123'));
+});
+
+

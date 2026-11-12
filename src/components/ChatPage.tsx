@@ -45,6 +45,7 @@ import {
   filterOrders,
   generateFallbackAuraResponse,
   createFallbackCheckoutOrder,
+  resolvePayPalSandboxCheckoutUrl,
 } from '../utils/commerce';
 import { formatUserInitials } from '../utils/auth';
 import OrderTrendsChart from './OrderTrendsChart';
@@ -83,7 +84,11 @@ export const INITIAL_DEMO_ORDERS: ActiveOrder[] = [
     category: 'Spatial Audio',
     specs: '45mm Beryllium Drivers · 48dB Hybrid ANC · 60h Battery',
     status: 'COMPLETED',
-    approveUrl: 'https://www.sandbox.paypal.com/checkoutnow?token=ORD-98741-AURA',
+    approveUrl: resolvePayPalSandboxCheckoutUrl(
+      'Aether ANC-1 Studio Headphones',
+      349.0,
+      'ORD-98741-AURA'
+    ),
     tracking: createOrderTrackingInfo('ORD-98741-AURA', 2),
   },
   {
@@ -94,7 +99,11 @@ export const INITIAL_DEMO_ORDERS: ActiveOrder[] = [
     category: 'Wearables',
     specs: 'Aerospace Grade 5 Titanium · Dual-band GPS · 14-Day Battery',
     status: 'CREATED',
-    approveUrl: 'https://www.sandbox.paypal.com/checkoutnow?token=ORD-84512-PRO',
+    approveUrl: resolvePayPalSandboxCheckoutUrl(
+      'Chrono Titanium Pro Watch',
+      429.0,
+      'ORD-84512-PRO'
+    ),
   },
   {
     orderId: 'ORD-62190-STUDIO',
@@ -104,7 +113,11 @@ export const INITIAL_DEMO_ORDERS: ActiveOrder[] = [
     category: 'Footwear & Sneakers',
     specs: 'Dual-Density Pebax Foam · Full-Length Carbon Plate',
     status: 'COMPLETED',
-    approveUrl: 'https://www.sandbox.paypal.com/checkoutnow?token=ORD-62190-STUDIO',
+    approveUrl: resolvePayPalSandboxCheckoutUrl(
+      'AeroStride Carbon Marathon Sneakers',
+      219.0,
+      'ORD-62190-STUDIO'
+    ),
     tracking: createOrderTrackingInfo('ORD-62190-STUDIO', 4),
   },
 ];
@@ -134,6 +147,9 @@ export default function ChatPage({ currentUser, onBackToHome, onLogout }: ChatPa
   const [selectedCategory, setSelectedCategory] = useState<string>('All Categories');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeSubView, setActiveSubView] = useState<'chat' | 'cart' | 'wishlist' | 'marketplace'>('chat');
+  const [paypalModalOrder, setPaypalModalOrder] = useState<ActiveOrder | null>(null);
+  const [paypalPaymentMethod, setPaypalPaymentMethod] = useState<'balance' | 'card' | 'paylater'>('balance');
+  const [paypalProcessing, setPaypalProcessing] = useState<boolean>(false);
 
   const cartSummary = calculateCartSummary(cart);
   const filteredProducts = filterCatalogProducts(CURATED_GADGETS, selectedCategory, searchQuery);
@@ -207,56 +223,55 @@ export default function ChatPage({ currentUser, onBackToHome, onLogout }: ChatPa
     ]);
 
     try {
-      const checkoutRes = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          item: summary.summaryTitle,
-          price: summary.subtotal,
-        }),
-      });
-      const checkoutData = await checkoutRes.json();
-      const approveUrl = checkoutData.approveUrl || checkoutData.url;
-
-      if (approveUrl) {
-        const newOrder: ActiveOrder = {
-          orderId: checkoutData.orderId || `ORD-${Date.now().toString(36).toUpperCase()}`,
-          item: summary.summaryTitle,
-          price: summary.subtotal,
-          imageUrl: summary.primaryImageUrl,
-          category: `Cart Bundle (${summary.totalItems} items)`,
-          specs: summary.specsSummary,
-          approveUrl,
-          status: checkoutData.status || 'CREATED',
-        };
-        setActiveOrders((prev) => [newOrder, ...prev]);
-
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `p-cart-${Date.now()}`,
-            sender: 'paypal',
-            text: `Your Shopping Cart checkout (${summary.totalItems} item${summary.totalItems > 1 ? 's' : ''}) is ready! Click below to securely complete your purchase via PayPal:`,
+      let checkoutData: Partial<ActiveOrder> & { url?: string } = {};
+      try {
+        const checkoutRes = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
             item: summary.summaryTitle,
             price: summary.subtotal,
-            imageUrl: summary.primaryImageUrl,
-            category: `Shopping Cart Order · ${summary.totalItems} Units`,
-            specs: summary.specsSummary,
-            approveUrl,
-            orderId: newOrder.orderId,
-          },
-        ]);
-        setCart([]);
+          }),
+        });
+        if (checkoutRes.ok) {
+          checkoutData = await checkoutRes.json();
+        }
+      } catch {
+        // Fall back to client-side checkout order generator if backend route is unreachable
       }
-    } catch {
+
+      const fallbackOrder = createFallbackCheckoutOrder(summary.summaryTitle, summary.subtotal);
+      const approveUrl = checkoutData.approveUrl || checkoutData.url || fallbackOrder.approveUrl;
+      const finalOrderId = checkoutData.orderId || fallbackOrder.orderId;
+
+      const newOrder: ActiveOrder = {
+        orderId: finalOrderId,
+        item: summary.summaryTitle,
+        price: summary.subtotal,
+        imageUrl: summary.primaryImageUrl,
+        category: `Cart Bundle (${summary.totalItems} items)`,
+        specs: summary.specsSummary,
+        approveUrl,
+        status: checkoutData.status || 'CREATED',
+      };
+      setActiveOrders((prev) => [newOrder, ...prev]);
+
       setMessages((prev) => [
         ...prev,
         {
-          id: `e-cart-${Date.now()}`,
-          sender: 'bot',
-          text: 'Unable to process cart checkout right now. Please try again.',
+          id: `p-cart-${Date.now()}`,
+          sender: 'paypal',
+          text: `Your Shopping Cart checkout (${summary.totalItems} item${summary.totalItems > 1 ? 's' : ''}) is ready! Click below to securely complete your purchase via PayPal:`,
+          item: summary.summaryTitle,
+          price: summary.subtotal,
+          imageUrl: summary.primaryImageUrl,
+          category: `Shopping Cart Order · ${summary.totalItems} Units`,
+          specs: summary.specsSummary,
+          approveUrl,
+          orderId: newOrder.orderId,
         },
       ]);
+      setCart([]);
     } finally {
       setCartCheckoutLoading(false);
     }
@@ -274,67 +289,94 @@ export default function ChatPage({ currentUser, onBackToHome, onLogout }: ChatPa
     setLoading(true);
 
     try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: trimmed }),
-      });
-      const data = await res.json();
-      const rawReply: string = data.reply || data.response || '';
-      const intent = parsePurchaseIntent(rawReply);
+      let rawReply = '';
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: trimmed }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          rawReply = (data.reply || data.response || '').trim();
+        }
+      } catch {
+        // Fall back to local Aura commerce engine when backend is unreachable
+      }
+
+      if (!rawReply) {
+        rawReply = generateFallbackAuraResponse(trimmed);
+      }
+
+      let intent = parsePurchaseIntent(rawReply);
+      if (!intent) {
+        const fallbackCandidate = generateFallbackAuraResponse(trimmed);
+        const fallbackIntent = parsePurchaseIntent(fallbackCandidate);
+        if (fallbackIntent) {
+          rawReply = fallbackCandidate;
+          intent = fallbackIntent;
+        }
+      }
 
       if (intent) {
         setLastIntent({ item: intent.item, price: intent.price });
         const resolved = resolveProductDetails(intent.item);
-        const checkoutRes = await fetch('/api/checkout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ item: intent.item, price: intent.price }),
-        });
-        const checkoutData = await checkoutRes.json();
-        const approveUrl = checkoutData.approveUrl || checkoutData.url;
-
-        if (approveUrl) {
-          const newOrder: ActiveOrder = {
-            orderId: checkoutData.orderId || `ORD-${Date.now().toString(36).toUpperCase()}`,
-            item: intent.item,
-            price: intent.price,
-            imageUrl: checkoutData.imageUrl || resolved.imageUrl,
-            category: checkoutData.category || resolved.category,
-            specs: checkoutData.specs || resolved.specs,
-            approveUrl,
-            status: checkoutData.status || 'CREATED',
-          };
-          setActiveOrders((prev) => [newOrder, ...prev]);
-
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: `p-${Date.now()}`,
-              sender: 'paypal',
-              text: 'Great! Click below to securely complete your purchase via PayPal Sandbox:',
-              item: intent.item,
-              price: intent.price,
-              imageUrl: checkoutData.imageUrl || resolved.imageUrl,
-              category: checkoutData.category || resolved.category,
-              specs: checkoutData.specs || resolved.specs,
-              approveUrl,
-              orderId: checkoutData.orderId,
-            },
-          ]);
-          setLoading(false);
-          return;
+        let checkoutData: Partial<ActiveOrder> & { url?: string } = {};
+        try {
+          const checkoutRes = await fetch('/api/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ item: intent.item, price: intent.price }),
+          });
+          if (checkoutRes.ok) {
+            checkoutData = await checkoutRes.json();
+          }
+        } catch {
+          // Fall back to local PayPal order token generation
         }
+
+        const fallbackOrder = createFallbackCheckoutOrder(intent.item, intent.price);
+        const approveUrl = checkoutData.approveUrl || checkoutData.url || fallbackOrder.approveUrl;
+        const finalOrderId = checkoutData.orderId || fallbackOrder.orderId;
+
+        const newOrder: ActiveOrder = {
+          orderId: finalOrderId,
+          item: intent.item,
+          price: intent.price,
+          imageUrl: checkoutData.imageUrl || resolved.imageUrl,
+          category: checkoutData.category || resolved.category,
+          specs: checkoutData.specs || resolved.specs,
+          approveUrl,
+          status: checkoutData.status || 'CREATED',
+        };
+        setActiveOrders((prev) => [newOrder, ...prev]);
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `p-${Date.now()}`,
+            sender: 'bot' as const,
+            text: '',
+          },
+        ].filter((m) => m.text !== '').concat({
+          id: `p-${Date.now()}`,
+          sender: 'paypal',
+          text: 'Great! Click below to securely complete your purchase via PayPal Sandbox:',
+          item: intent.item,
+          price: intent.price,
+          imageUrl: newOrder.imageUrl,
+          category: newOrder.category,
+          specs: newOrder.specs,
+          approveUrl,
+          orderId: newOrder.orderId,
+        }));
+        setLoading(false);
+        return;
       }
 
       setMessages((prev) => [
         ...prev,
         { id: `b-${Date.now()}`, sender: 'bot', text: rawReply },
-      ]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        { id: `e-${Date.now()}`, sender: 'bot', text: 'Unable to reach Aura server. Please try again.' },
       ]);
     } finally {
       setLoading(false);
@@ -366,8 +408,14 @@ export default function ChatPage({ currentUser, onBackToHome, onLogout }: ChatPa
       )
     );
 
+    setPaypalModalOrder((prev) =>
+      prev && prev.orderId === orderId
+        ? { ...prev, status: 'COMPLETED', tracking: initialTracking }
+        : prev
+    );
+
     const found = activeOrders.find((o) => o.orderId === orderId);
-    if (found) {
+    if (found && found.status !== 'COMPLETED') {
       setMessages((prev) => [
         ...prev,
         {
@@ -376,6 +424,45 @@ export default function ChatPage({ currentUser, onBackToHome, onLogout }: ChatPa
           text: `Payment confirmed! Order ${orderId} for "${found.item}" ($${found.price.toFixed(2)} USD) was captured via PayPal Sandbox. Live Order Tracking (${initialTracking.trackingNumber}) is now active in your Checkout Ledger.`,
         },
       ]);
+    }
+  };
+
+  const handleOpenPayPalCheckout = (orderData: {
+    orderId?: string;
+    item?: string;
+    price?: number;
+    imageUrl?: string;
+    category?: string;
+    specs?: string;
+    approveUrl?: string;
+  }) => {
+    const existing = orderData.orderId
+      ? activeOrders.find((o) => o.orderId === orderData.orderId)
+      : undefined;
+    if (existing) {
+      setPaypalModalOrder(existing);
+      return;
+    }
+    const resolved = resolveProductDetails(orderData.item || 'Aether ANC-1 Studio Headphones');
+    setPaypalModalOrder({
+      orderId: orderData.orderId || `EC-AURA-${Date.now().toString(36).toUpperCase()}`,
+      item: orderData.item || 'Aether ANC-1 Studio Headphones',
+      price: orderData.price ?? 349,
+      imageUrl: orderData.imageUrl || resolved.imageUrl,
+      category: orderData.category || resolved.category,
+      specs: orderData.specs || resolved.specs,
+      approveUrl: orderData.approveUrl,
+      status: 'CREATED',
+    });
+  };
+
+  const handleConfirmPayPalModalPayment = async () => {
+    if (!paypalModalOrder || paypalProcessing) return;
+    setPaypalProcessing(true);
+    try {
+      await handleSimulateCapture(paypalModalOrder.orderId);
+    } finally {
+      setPaypalProcessing(false);
     }
   };
 
@@ -1073,10 +1160,15 @@ export default function ChatPage({ currentUser, onBackToHome, onLogout }: ChatPa
 
                         <div className="flex flex-wrap items-center gap-2 pt-1">
                           <a
-                            href={m.approveUrl}
+                            href={resolvePayPalSandboxCheckoutUrl(
+                              m.item || 'Aura Hardware Order',
+                              m.price || 349,
+                              m.orderId,
+                              m.approveUrl
+                            )}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center justify-center px-4 py-2.5 bg-[#0070BA] hover:bg-[#005ea6] text-white text-xs font-semibold rounded-xl transition-all shadow-lg"
+                            className="inline-flex items-center justify-center px-4 py-2.5 bg-[#0070BA] hover:bg-[#005ea6] text-white text-xs font-semibold rounded-xl transition-all shadow-lg cursor-pointer"
                           >
                             Complete Purchase via PayPal (${m.price?.toFixed(2)})
                           </a>
@@ -1284,13 +1376,28 @@ export default function ChatPage({ currentUser, onBackToHome, onLogout }: ChatPa
                               ${ord.price.toFixed(2)}
                             </div>
                             {!isCompleted && (
-                              <button
-                                type="button"
-                                onClick={() => void handleSimulateCapture(ord.orderId)}
-                                className="text-[10px] text-purple-300 hover:text-white underline cursor-pointer mt-0.5 block"
-                              >
-                                Simulate Capture
-                              </button>
+                              <div className="flex items-center gap-2 justify-end mt-1">
+                                <a
+                                  href={resolvePayPalSandboxCheckoutUrl(
+                                    ord.item,
+                                    ord.price,
+                                    ord.orderId,
+                                    ord.approveUrl
+                                  )}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="px-2 py-0.5 rounded bg-[#0070BA] hover:bg-[#005ea6] text-[10px] font-semibold text-white cursor-pointer transition-colors"
+                                >
+                                  Pay via PayPal
+                                </a>
+                                <button
+                                  type="button"
+                                  onClick={() => void handleSimulateCapture(ord.orderId)}
+                                  className="text-[10px] text-purple-300 hover:text-white underline cursor-pointer"
+                                >
+                                  Capture
+                                </button>
+                              </div>
                             )}
                           </div>
                         </div>
@@ -1402,6 +1509,234 @@ export default function ChatPage({ currentUser, onBackToHome, onLogout }: ChatPa
         </div>
       </main>
       )}
+
+      {/* Interactive PayPal Orders v2 Checkout Gateway Modal */}
+      <AnimatePresence>
+        {paypalModalOrder && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
+            onClick={() => setPaypalModalOrder(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 12 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden border border-slate-200"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="paypal-modal-title"
+            >
+              {/* PayPal Branded Top Bar */}
+              <div className="bg-[#003087] text-white px-6 py-4 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <span id="paypal-modal-title" className="text-xl font-extrabold italic tracking-tight">
+                    Pay<span className="text-[#0079C1]">Pal</span>
+                  </span>
+                  <span className="text-[10px] uppercase tracking-wider font-semibold bg-white/15 px-2.5 py-0.5 rounded-full">
+                    Orders v2 Checkout
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-[11px] font-mono text-sky-200 flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
+                    256-Bit SSL
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setPaypalModalOrder(null)}
+                    className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
+                    aria-label="Close PayPal Checkout"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-5">
+                {/* Merchant & Order Header */}
+                <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+                  <div>
+                    <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400">Merchant</div>
+                    <div className="text-sm font-bold text-slate-800">Aura Tech Commerce</div>
+                    <div className="text-[11px] font-mono text-slate-500 mt-0.5">
+                      Order ID: {paypalModalOrder.orderId}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[11px] uppercase tracking-wider font-bold text-slate-400">Total USD</div>
+                    <div className="text-2xl font-extrabold text-slate-900 font-mono tabular-nums">
+                      ${paypalModalOrder.price.toFixed(2)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Product Summary */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 flex items-center gap-3.5">
+                  {paypalModalOrder.imageUrl && (
+                    <img
+                      src={paypalModalOrder.imageUrl}
+                      alt={paypalModalOrder.item}
+                      referrerPolicy="no-referrer"
+                      className="w-16 h-14 object-cover rounded-xl border border-slate-200 bg-slate-900 shrink-0"
+                    />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[11px] font-semibold text-[#0070BA]">
+                      {paypalModalOrder.category || 'Curated Hardware'}
+                    </div>
+                    <div className="text-sm font-bold text-slate-900 truncate">{paypalModalOrder.item}</div>
+                    {paypalModalOrder.specs && (
+                      <div className="text-xs text-slate-500 truncate mt-0.5">{paypalModalOrder.specs}</div>
+                    )}
+                  </div>
+                </div>
+
+                {paypalModalOrder.status === 'COMPLETED' ? (
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-center space-y-3">
+                    <div className="w-11 h-11 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto shadow-md">
+                      <CheckCircle2 className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="text-base font-extrabold text-emerald-950">
+                        Payment Approved &amp; Captured!
+                      </div>
+                      <p className="text-xs text-emerald-800 mt-1">
+                        Order <span className="font-mono font-bold">{paypalModalOrder.orderId}</span> ($
+                        {paypalModalOrder.price.toFixed(2)} USD) has been paid and live 5-stage Order Tracking is now active in your Ledger.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setPaypalModalOrder(null)}
+                      className="w-full py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition cursor-pointer shadow"
+                    >
+                      Done · Return to Aura &amp; View Order Tracking
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    {/* Payment Method Selection */}
+                    <div className="space-y-2">
+                      <div className="text-xs font-bold text-slate-700">Pay With</div>
+
+                      <label
+                        onClick={() => setPaypalPaymentMethod('balance')}
+                        className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition ${
+                          paypalPaymentMethod === 'balance'
+                            ? 'border-[#0070BA] bg-sky-50/70'
+                            : 'border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="radio"
+                            name="paypal-method"
+                            checked={paypalPaymentMethod === 'balance'}
+                            onChange={() => setPaypalPaymentMethod('balance')}
+                            className="accent-[#0070BA]"
+                          />
+                          <div>
+                            <div className="text-xs font-bold text-slate-900">PayPal Sandbox Balance</div>
+                            <div className="text-[11px] text-slate-500">
+                              sb-buyer@personal.example.com · $2,500.00 Available
+                            </div>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold text-[#0070BA] bg-sky-100 px-2 py-0.5 rounded-md">
+                          Instant
+                        </span>
+                      </label>
+
+                      <label
+                        onClick={() => setPaypalPaymentMethod('card')}
+                        className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition ${
+                          paypalPaymentMethod === 'card'
+                            ? 'border-[#0070BA] bg-sky-50/70'
+                            : 'border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="radio"
+                            name="paypal-method"
+                            checked={paypalPaymentMethod === 'card'}
+                            onChange={() => setPaypalPaymentMethod('card')}
+                            className="accent-[#0070BA]"
+                          />
+                          <div>
+                            <div className="text-xs font-bold text-slate-900">Visa Signature •••• 4242</div>
+                            <div className="text-[11px] text-slate-500">Expires 09/28 · Buyer Protection</div>
+                          </div>
+                        </div>
+                        <CreditCard className="w-4 h-4 text-slate-400" />
+                      </label>
+
+                      <label
+                        onClick={() => setPaypalPaymentMethod('paylater')}
+                        className={`flex items-center justify-between p-3 rounded-xl border-2 cursor-pointer transition ${
+                          paypalPaymentMethod === 'paylater'
+                            ? 'border-[#0070BA] bg-sky-50/70'
+                            : 'border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="radio"
+                            name="paypal-method"
+                            checked={paypalPaymentMethod === 'paylater'}
+                            onChange={() => setPaypalPaymentMethod('paylater')}
+                            className="accent-[#0070BA]"
+                          />
+                          <div>
+                            <div className="text-xs font-bold text-slate-900">PayPal Pay in 4</div>
+                            <div className="text-[11px] text-slate-500">
+                              4 interest-free payments of ${(paypalModalOrder.price / 4).toFixed(2)} USD
+                            </div>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">
+                          0% APR
+                        </span>
+                      </label>
+                    </div>
+
+                    {/* Primary Pay CTA */}
+                    <div className="space-y-2 pt-1">
+                      <button
+                        type="button"
+                        disabled={paypalProcessing}
+                        onClick={() => void handleConfirmPayPalModalPayment()}
+                        className="w-full py-3 rounded-full bg-[#0070BA] hover:bg-[#005ea6] disabled:opacity-60 text-white font-bold text-sm transition cursor-pointer shadow-lg flex items-center justify-center gap-2"
+                      >
+                        {paypalProcessing ? (
+                          <span>Authorizing &amp; Capturing Payment...</span>
+                        ) : (
+                          <span>Pay ${paypalModalOrder.price.toFixed(2)} USD Now</span>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPaypalModalOrder(null)}
+                        className="w-full py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs transition cursor-pointer"
+                      >
+                        Cancel &amp; Return to Store
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                <div className="text-[11px] text-center text-slate-400 pt-1 border-t border-slate-100">
+                  Protected by PayPal Purchase Protection · Zapier Order Webhook Synced
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

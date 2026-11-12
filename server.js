@@ -364,8 +364,11 @@ function isConfiguredSecret(val) {
     'PAYPAL_CLIENT_SECRET',
     'YOUR_ZAPIER_WEBHOOK_URL',
     'ZAPIER_WEBHOOK_URL',
+    'https://hooks.zapier.com/hooks/catch/your_webhook_id',
   ];
-  return !placeholders.includes(trimmed);
+  if (placeholders.includes(trimmed)) return false;
+  if (trimmed.toLowerCase().includes('your_webhook_id')) return false;
+  return true;
 }
 
 function parsePurchaseIntent(responseText) {
@@ -668,8 +671,8 @@ app.post('/api/checkout', async (req, res) => {
     };
     sessionOrders.unshift(orderRecord);
 
-    // Asynchronously dispatch order details to Zapier webhook
-    if (process.env.ZAPIER_WEBHOOK_URL) {
+    // Asynchronously dispatch order details to Zapier webhook when a valid webhook URL is configured
+    if (isConfiguredSecret(process.env.ZAPIER_WEBHOOK_URL)) {
       try {
         await axios.post(
           process.env.ZAPIER_WEBHOOK_URL,
@@ -687,8 +690,8 @@ app.post('/api/checkout', async (req, res) => {
             timeout: 8000,
           }
         );
-      } catch (zapierError) {
-        console.error('Zapier webhook logging failed:', zapierError?.message || zapierError);
+      } catch (_zapierError) {
+        // Non-blocking: ignore Zapier webhook error so PayPal checkout always succeeds
       }
     }
 
@@ -724,8 +727,8 @@ app.post('/api/checkout', async (req, res) => {
     };
     sessionOrders.unshift(orderRecord);
 
-    // Asynchronously dispatch order details to Zapier webhook in preview fallback mode as well
-    if (process.env.ZAPIER_WEBHOOK_URL) {
+    // Asynchronously dispatch order details to Zapier webhook in preview fallback mode when configured
+    if (isConfiguredSecret(process.env.ZAPIER_WEBHOOK_URL)) {
       try {
         await axios.post(
           process.env.ZAPIER_WEBHOOK_URL,
@@ -743,8 +746,8 @@ app.post('/api/checkout', async (req, res) => {
             timeout: 8000,
           }
         );
-      } catch (zapierError) {
-        console.error('Zapier webhook logging failed (fallback):', zapierError?.message || zapierError);
+      } catch (_zapierError) {
+        // Non-blocking: ignore Zapier webhook error so PayPal checkout always succeeds
       }
     }
 
